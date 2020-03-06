@@ -1,0 +1,5 @@
+name: 'UGF.Draft.TypeScript'
+description: 'Action description.'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

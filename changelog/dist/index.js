@@ -3526,6 +3526,7 @@ function run() {
             const log = changelog.createChangelog(milestones, issues, config);
             const format = changelog.formatChangelog(log, config);
             console.log(format);
+            console.log(JSON.stringify(log));
         }
         catch (error) {
             core.setFailed(error.message);
@@ -6219,7 +6220,7 @@ function formatMilestone(milestone, config) {
     let format = '';
     const lineEnd = '\n\r';
     format += '## ' + milestone.name + ' - ' + milestone.date.toISOString() + lineEnd;
-    format += ' - [Commits](' + config.repoUrl + '/compare/0...' + milestone.name + ')';
+    format += ' - [Commits](' + config.repoUrl + '/compare/0...' + milestone.name + ')' + lineEnd;
     format += ' - [Milestone](' + config.repoUrl + '/milestone/' + milestone.number + '?closed=1)' + lineEnd;
     for (const section of milestone.sections) {
         format += formatSection(section);

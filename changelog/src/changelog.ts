@@ -211,7 +211,7 @@ function getMilestoneGroups(milestones: MilestoneInfo[], issues: IssueInfo[]): M
     }
 
     for (const issue of issues) {
-        if (issue.pull_request != null && issue.milestone != null) {
+        if (issue.pull_request == null && issue.milestone != null) {
             const info = groups.get(issue.milestone.number)
 
             info?.issues.push(issue)

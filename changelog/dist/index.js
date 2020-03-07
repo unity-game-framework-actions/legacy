@@ -6289,7 +6289,7 @@ function getMilestoneGroups(milestones, issues) {
         groups.set(milestone.number, info);
     }
     for (const issue of issues) {
-        if (issue.pull_request != null && issue.milestone != null) {
+        if (issue.pull_request == null && issue.milestone != null) {
             const info = groups.get(issue.milestone.number);
             info === null || info === void 0 ? void 0 : info.issues.push(issue);
         }

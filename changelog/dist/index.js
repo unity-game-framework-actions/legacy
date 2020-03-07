@@ -6218,9 +6218,9 @@ exports.formatChangelog = formatChangelog;
 function formatMilestone(milestone, config) {
     let format = '';
     const lineEnd = '\n\r';
-    format += '## ' + milestone.name + ' - ' + milestone.date.toISOString + lineEnd;
-    format += ' - [Commits](' + config.repoUrl + 'compare/0...' + milestone.name + ')' + lineEnd;
-    format += ' - [Milestone](' + config.repoUrl + 'milestone/' + milestone.number + '?closed=1)' + lineEnd;
+    format += '## ' + milestone.name + ' - ' + milestone.date.toISOString() + lineEnd;
+    format += ' - [Commits](' + config.repoUrl + '/compare/0...' + milestone.name + ')';
+    format += ' - [Milestone](' + config.repoUrl + '/milestone/' + milestone.number + '?closed=1)' + lineEnd;
     for (const section of milestone.sections) {
         format += formatSection(section);
     }

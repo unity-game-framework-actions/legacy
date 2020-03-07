@@ -117,7 +117,7 @@ function formatMilestone(milestone: ChangelogMilestone, config: ChangelogConfig)
     const lineEnd = '\n\r'
 
     format += '## ' + milestone.name + ' - ' + milestone.date.toISOString() + lineEnd
-    format += ' - [Commits](' + config.repoUrl + '/compare/0...' + milestone.name + ')'
+    format += ' - [Commits](' + config.repoUrl + '/compare/0...' + milestone.name + ')' + lineEnd
     format += ' - [Milestone](' + config.repoUrl + '/milestone/' + milestone.number + '?closed=1)' + lineEnd
 
     for (const section of milestone.sections) {

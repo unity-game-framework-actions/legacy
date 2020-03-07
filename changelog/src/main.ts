@@ -18,6 +18,7 @@ async function run(): Promise<void> {
     const format = changelog.formatChangelog(log, config)
     
     console.log(format)
+    console.log(JSON.stringify(log))
   } catch (error) {
     core.setFailed(error.message)
   }

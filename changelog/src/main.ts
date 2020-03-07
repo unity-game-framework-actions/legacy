@@ -18,7 +18,9 @@ async function run(): Promise<void> {
     const format = changelog.formatChangelog(log, config)
     
     console.log(format)
-    console.log(JSON.stringify(log))
+    console.log(JSON.stringify(log, null, 2))
+    console.log(JSON.stringify(milestones, null, 2))
+    console.log(JSON.stringify(issues, null, 2))
   } catch (error) {
     core.setFailed(error.message)
   }

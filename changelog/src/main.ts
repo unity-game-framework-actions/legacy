@@ -15,17 +15,16 @@ async function run(): Promise<void> {
 
     if (core.isDebug()) {
       core.debug(`Working directory: '${__dirname}'.`)
-      core.debug(`workspace: '${workspace}'.`)
-      core.debug(`milestones-request: '${milestonesRequest}'.`)
-      core.debug(`issues-request: '${issuesRequest}'.`)
-      core.debug(`configPath: '${configPath}'.`)
+      core.debug(`Input workspace: '${workspace}'.`)
+      core.debug(`Input milestones-request: '${milestonesRequest}'.`)
+      core.debug(`Input issues-request: '${issuesRequest}'.`)
+      core.debug(`Input configPath: '${configPath}'.`)
     }
 
-    if (configPath == null) {
+    if (configPath === null) {
       configPath = `${__dirname}/../res/config.json`
 
-      core.info('configPath not specified, using default config.')
-      core.debug(configPath)
+      core.debug(`Input configPath: '${configPath}'.`)
     }
 
     const github = new GitHub(token)

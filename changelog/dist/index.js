@@ -3523,15 +3523,14 @@ function run() {
             let configPath = core.getInput('config-path');
             if (core.isDebug()) {
                 core.debug(`Working directory: '${__dirname}'.`);
-                core.debug(`workspace: '${workspace}'.`);
-                core.debug(`milestones-request: '${milestonesRequest}'.`);
-                core.debug(`issues-request: '${issuesRequest}'.`);
-                core.debug(`configPath: '${configPath}'.`);
+                core.debug(`Input workspace: '${workspace}'.`);
+                core.debug(`Input milestones-request: '${milestonesRequest}'.`);
+                core.debug(`Input issues-request: '${issuesRequest}'.`);
+                core.debug(`Input configPath: '${configPath}'.`);
             }
-            if (configPath == null) {
+            if (configPath === null) {
                 configPath = __webpack_require__.ab + "config.json";
-                core.info('configPath not specified, using default config.');
-                core.debug(__webpack_require__.ab + "config.json");
+                core.debug(`Input configPath: '${configPath}'.`);
             }
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
@@ -6207,7 +6206,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 function getFirstCommitSha(commits) {
-    commits.sort((a, b) => a.commit.committer.data.getTime() - b.commit.committer.data.getTime());
+    commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date));
     return commits[0].sha;
 }
 exports.getFirstCommitSha = getFirstCommitSha;

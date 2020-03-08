@@ -63,7 +63,7 @@ type LabelInfo = {
 }
 
 export function getFirstCommitSha(commits: Array<any>): string {
-  commits.sort((a, b) => a.commit.committer.data.getTime() - b.commit.committer.data.getTime())
+  commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date))
 
   return commits[0].sha
 }

@@ -3521,16 +3521,15 @@ function run() {
             const milestonesRequest = core.getInput('milestones-request');
             const issuesRequest = core.getInput('issues-request');
             let configPath = core.getInput('config-path');
+            if (configPath === null) {
+                configPath = __webpack_require__.ab + "config.json";
+            }
             if (core.isDebug()) {
                 core.debug(`Working directory: '${__dirname}'.`);
                 core.debug(`Input workspace: '${workspace}'.`);
                 core.debug(`Input milestones-request: '${milestonesRequest}'.`);
                 core.debug(`Input issues-request: '${issuesRequest}'.`);
-                core.debug(`Input configPath: '${configPath}'.`);
-            }
-            if (configPath === null) {
-                configPath = __webpack_require__.ab + "config.json";
-                core.debug(`Input configPath: '${configPath}'.`);
+                core.debug(`Input config-path: '${configPath}'.`);
             }
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
@@ -6225,7 +6224,7 @@ function formatChangelog(changelog, repoConfig, config) {
 exports.formatChangelog = formatChangelog;
 function formatMilestone(milestone, repoConfig, config, previousTag) {
     let format = '';
-    format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`;
+    format += `\n\r## ${milestone.name} - ${formatDate(milestone.date)}`;
     format += `\n\r - [Commits](${repoConfig.url}/compare/${previousTag}...${milestone.name})`;
     format += `\n\r - [Milestone](${repoConfig.url}/milestone/${milestone.number}?closed=1)`;
     for (const section of milestone.sections) {
@@ -6350,6 +6349,11 @@ function hasLabel(labels, name) {
         }
     }
     return false;
+}
+function formatDate(date) {
+    const iso = date.toISOString();
+    const index = iso.indexOf('T');
+    return iso.substr(0, index);
 }
 
 

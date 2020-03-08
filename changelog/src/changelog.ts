@@ -89,7 +89,7 @@ export function formatChangelog(changelog: Changelog, repoConfig: RepoConfig, co
 function formatMilestone(milestone: ChangelogMilestone, repoConfig: RepoConfig, config: ChangelogConfig, previousTag: string): string {
   let format = ''
 
-  format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`
+  format += `\n\r## ${milestone.name} - ${formatDate(milestone.date)}`
   format += `\n\r - [Commits](${repoConfig.url}/compare/${previousTag}...${milestone.name})`
   format += `\n\r - [Milestone](${repoConfig.url}/milestone/${milestone.number}?closed=1)`
 
@@ -257,4 +257,11 @@ function hasLabel(labels: LabelInfo[], name: string): boolean {
     }
   }
   return false
+}
+
+function formatDate(date: Date): string {
+  const iso = date.toISOString()
+  const index = iso.indexOf('T')
+
+  return iso.substr(0, index)
 }

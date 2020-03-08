@@ -13,18 +13,16 @@ async function run(): Promise<void> {
     const issuesRequest = core.getInput('issues-request')
     let configPath = core.getInput('config-path')
 
+    if (configPath === null) {
+      configPath = `${__dirname}/../res/config.json`
+    }
+
     if (core.isDebug()) {
       core.debug(`Working directory: '${__dirname}'.`)
       core.debug(`Input workspace: '${workspace}'.`)
       core.debug(`Input milestones-request: '${milestonesRequest}'.`)
       core.debug(`Input issues-request: '${issuesRequest}'.`)
-      core.debug(`Input configPath: '${configPath}'.`)
-    }
-
-    if (configPath === null) {
-      configPath = `${__dirname}/../res/config.json`
-
-      core.debug(`Input configPath: '${configPath}'.`)
+      core.debug(`Input config-path: '${configPath}'.`)
     }
 
     const github = new GitHub(token)

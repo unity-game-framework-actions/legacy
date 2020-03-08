@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 import * as changelog from './changelog'
+import {promises as fs} from 'fs'
 
 run()
 
@@ -18,7 +19,7 @@ async function run(): Promise<void> {
     const milestones = (await github.issues.listMilestonesForRepo({owner, repo, state: getState(milestonesRequest)})).data
     const issues = (await github.issues.listForRepo({owner, repo, state: getState(issuesRequest)})).data
     const commits = (await github.repos.listCommits({owner, repo})).data
-    const config = await import(configPath)
+    const config = JSON.parse((await fs.readFile(configPath)).toString())
 
     const url = `https://github.com/${owner}/${repo}`
     const sha = changelog.getFirstCommitSha(commits)

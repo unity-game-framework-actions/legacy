@@ -3511,6 +3511,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 const changelog = __importStar(__webpack_require__(375));
+const fs_1 = __webpack_require__(747);
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -3525,7 +3526,7 @@ function run() {
             const milestones = (yield github.issues.listMilestonesForRepo({ owner, repo, state: getState(milestonesRequest) })).data;
             const issues = (yield github.issues.listForRepo({ owner, repo, state: getState(issuesRequest) })).data;
             const commits = (yield github.repos.listCommits({ owner, repo })).data;
-            const config = yield Promise.resolve().then(() => __importStar(require(configPath)));
+            const config = JSON.parse((yield fs_1.promises.readFile(configPath)).toString());
             const url = `https://github.com/${owner}/${repo}`;
             const sha = changelog.getFirstCommitSha(commits);
             const repoConfig = {

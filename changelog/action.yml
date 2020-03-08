@@ -12,7 +12,7 @@ inputs:
   config-path:
     required: false
   milestone:
-    description: 'Milestones to generate. Possible values: 'all' or number of a milestone.'
+    description: 'Milestones to generate. Possible values: all or number of a milestone.'
     required: true
 output:
   changelog:

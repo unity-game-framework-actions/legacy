@@ -3,6 +3,8 @@ description: 'No description.'
 inputs:
   token:
     default: ${{ github.token }}
+  workspace:
+    default: ${{ github.workspace }}
   milestones-request:
     default: closed
   issues-request:

@@ -3516,13 +3516,15 @@ run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (core.isDebug()) {
-                core.debug(`Working directory: ${__dirname}.`);
-            }
             const token = core.getInput('token');
+            const workspace = core.getInput('workspace');
             const milestonesRequest = core.getInput('milestones-request');
             const issuesRequest = core.getInput('issues-request');
             const configPath = core.getInput('config-path');
+            if (core.isDebug()) {
+                core.debug(`Working directory: '${__dirname}'.`);
+                core.debug(`Workspace: '${workspace}'.`);
+            }
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;

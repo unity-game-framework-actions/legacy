@@ -7,14 +7,16 @@ run()
 
 async function run(): Promise<void> {
   try {
-    if (core.isDebug()) {
-      core.debug(`Working directory: ${__dirname}.`)
-    }
-
     const token = core.getInput('token')
+    const workspace = core.getInput('workspace')
     const milestonesRequest = core.getInput('milestones-request')
     const issuesRequest = core.getInput('issues-request')
     const configPath = core.getInput('config-path')
+
+    if (core.isDebug()) {
+      core.debug(`Working directory: '${__dirname}'.`)
+      core.debug(`Workspace: '${workspace}'.`)
+    }
 
     const github = new GitHub(token)
     const owner = context.repo.owner

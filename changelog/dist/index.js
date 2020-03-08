@@ -6269,6 +6269,7 @@ function createMilestone(milestoneGroup, sectionConfigs) {
         date: new Date(milestoneGroup.milestone.closed_at),
         sections: []
     };
+    core.debug(`Create milestone '${milestoneGroup.milestone.number}'.`);
     const issues = groupIssuesBySection(milestoneGroup.issues, sectionConfigs);
     issues.forEach((value, key) => {
         const section = {
@@ -6289,11 +6290,13 @@ function getMilestoneGroups(milestones, issues) {
             issues: []
         };
         groups.set(milestone.number, info);
+        core.debug(`Create milestone group '${milestone.number}'.`);
     }
     for (const issue of issues) {
         if (issue.pull_request == null && issue.milestone != null) {
             const info = groups.get(issue.milestone.number);
             info === null || info === void 0 ? void 0 : info.issues.push(issue);
+            core.debug(`Add issues '${issue.number}' to milestone group '${info === null || info === void 0 ? void 0 : info.milestone.number}'.`);
         }
     }
     return Array.from(groups.values());

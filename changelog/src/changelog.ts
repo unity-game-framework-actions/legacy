@@ -97,10 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
 }
 
-export function formatChangelog(
-  changelog: Changelog,
-  config: ChangelogConfig
-): string {
+export function formatChangelog(changelog: Changelog, config: ChangelogConfig): string {
   let format = ''
 
   format += `# ${config.header}`
@@ -115,10 +112,7 @@ export function formatChangelog(
   return format
 }
 
-function formatMilestone(
-  milestone: ChangelogMilestone,
-  config: ChangelogConfig
-): string {
+function formatMilestone(milestone: ChangelogMilestone, config: ChangelogConfig): string {
   let format = ''
 
   format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`
@@ -152,11 +146,7 @@ function formatIssue(issue: IssueInfo): string {
   return format
 }
 
-export function createChangelog(
-  milestones: MilestoneInfo[],
-  issues: IssueInfo[],
-  config: ChangelogConfig
-): Changelog {
+export function createChangelog(milestones: MilestoneInfo[], issues: IssueInfo[], config: ChangelogConfig): Changelog {
   const changelog: Changelog = {
     milestones: []
   }
@@ -174,16 +164,15 @@ export function createChangelog(
   return changelog
 }
 
-function createMilestone(
-  milestoneGroup: MilestoneGroupInfo,
-  sectionConfigs: SectionConfig[]
-): ChangelogMilestone {
+function createMilestone(milestoneGroup: MilestoneGroupInfo, sectionConfigs: SectionConfig[]): ChangelogMilestone {
   const milestone: ChangelogMilestone = {
     name: milestoneGroup.milestone.title,
     number: milestoneGroup.milestone.number,
     date: new Date(milestoneGroup.milestone.closed_at),
     sections: []
   }
+
+  core.debug(`Create milestone '${milestoneGroup.milestone.number}'.`)
 
   const issues = groupIssuesBySection(milestoneGroup.issues, sectionConfigs)
 
@@ -203,10 +192,7 @@ function createMilestone(
   return milestone
 }
 
-function getMilestoneGroups(
-  milestones: MilestoneInfo[],
-  issues: IssueInfo[]
-): MilestoneGroupInfo[] {
+function getMilestoneGroups(milestones: MilestoneInfo[], issues: IssueInfo[]): MilestoneGroupInfo[] {
   var groups = new Map<number, MilestoneGroupInfo>()
 
   for (const milestone of milestones) {
@@ -216,6 +202,8 @@ function getMilestoneGroups(
     }
 
     groups.set(milestone.number, info)
+
+    core.debug(`Create milestone group '${milestone.number}'.`)
   }
 
   for (const issue of issues) {
@@ -223,16 +211,15 @@ function getMilestoneGroups(
       const info = groups.get(issue.milestone.number)
 
       info?.issues.push(issue)
+
+      core.debug(`Add issues '${issue.number}' to milestone group '${info?.milestone.number}'.`)
     }
   }
 
   return Array.from(groups.values())
 }
 
-function groupIssuesBySection(
-  issues: IssueInfo[],
-  sectionConfigs: SectionConfig[]
-): Map<string, IssueInfo[]> {
+function groupIssuesBySection(issues: IssueInfo[], sectionConfigs: SectionConfig[]): Map<string, IssueInfo[]> {
   const groups = new Map<string, IssueInfo[]>()
 
   for (const issue of issues) {
@@ -250,10 +237,7 @@ function groupIssuesBySection(
   return groups
 }
 
-function getOrCreate<TKey, TArray>(
-  map: Map<TKey, TArray[]>,
-  key: TKey
-): TArray[] {
+function getOrCreate<TKey, TArray>(map: Map<TKey, TArray[]>, key: TKey): TArray[] {
   let result: TArray[] | undefined = map.get(key)
 
   if (result == undefined) {

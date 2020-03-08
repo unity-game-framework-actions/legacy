@@ -248,9 +248,9 @@ function getOrCreate<TKey, TArray>(map: Map<TKey, TArray[]>, key: TKey): TArray[
     return result
 }
 
-function hasAnyLabel(labels: LabelInfo[], targets: string[]): boolean {
-    for (const label of targets) {
-        if (hasLabel(labels, label)) {
+function hasAnyLabel(labels: LabelInfo[], names: string[]): boolean {
+    for (const name of names) {
+        if (hasLabel(labels, name)) {
             return true
         }
     }
@@ -259,7 +259,7 @@ function hasAnyLabel(labels: LabelInfo[], targets: string[]): boolean {
 
 function hasLabel(labels: LabelInfo[], name: string): boolean {
     for (const label of labels) {
-        if (label.name.toLowerCase == name.toLowerCase) {
+        if (label.name.toLowerCase === name.toLowerCase) {
             return true
         }
     }

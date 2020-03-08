@@ -12,6 +12,7 @@ async function run(): Promise<void> {
     const milestonesRequest = core.getInput('milestones-request')
     const issuesRequest = core.getInput('issues-request')
     let configPath = core.getInput('config-path')
+    const milestone = core.getInput('milestone')
 
     if (configPath === null) {
       configPath = `${__dirname}/../res/config.json`
@@ -23,6 +24,7 @@ async function run(): Promise<void> {
       core.debug(`Input milestones-request: '${milestonesRequest}'.`)
       core.debug(`Input issues-request: '${issuesRequest}'.`)
       core.debug(`Input config-path: '${configPath}'.`)
+      core.debug(`Input milestone: '${milestone}'.`)
     }
 
     const github = new GitHub(token)
@@ -34,18 +36,23 @@ async function run(): Promise<void> {
     const commits = (await github.repos.listCommits({owner, repo})).data
     const config = JSON.parse((await fs.readFile(configPath)).toString())
 
-    const url = `https://github.com/${owner}/${repo}`
-    const sha = changelog.getFirstCommitSha(commits)
-
     const repoConfig: changelog.RepoConfig = {
-      url: url,
-      firstCommitSha: sha
+      owner: owner,
+      repo: repo,
+      milestones: milestones,
+      issues: issues,
+      commits: commits
     }
 
-    const log = changelog.createChangelog(milestones, issues, config)
-    const format = changelog.formatChangelog(log, repoConfig, config)
+    if (milestone === 'all') {
+      const result = changelog.generateMilestoneAll(repoConfig, config)
 
-    core.info(format)
+      core.setOutput('changelog', result)
+    } else {
+      const result = changelog.generateMilestone(repoConfig, config, milestone)
+
+      core.setOutput('changelog', result)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }

@@ -3521,6 +3521,7 @@ function run() {
             const milestonesRequest = core.getInput('milestones-request');
             const issuesRequest = core.getInput('issues-request');
             let configPath = core.getInput('config-path');
+            const milestone = core.getInput('milestone');
             if (configPath === null) {
                 configPath = __webpack_require__.ab + "config.json";
             }
@@ -3530,6 +3531,7 @@ function run() {
                 core.debug(`Input milestones-request: '${milestonesRequest}'.`);
                 core.debug(`Input issues-request: '${issuesRequest}'.`);
                 core.debug(`Input config-path: '${configPath}'.`);
+                core.debug(`Input milestone: '${milestone}'.`);
             }
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
@@ -3538,15 +3540,21 @@ function run() {
             const issues = (yield github.issues.listForRepo({ owner, repo, state: getState(issuesRequest) })).data;
             const commits = (yield github.repos.listCommits({ owner, repo })).data;
             const config = JSON.parse((yield fs_1.promises.readFile(__webpack_require__.ab + "config.json")).toString());
-            const url = `https://github.com/${owner}/${repo}`;
-            const sha = changelog.getFirstCommitSha(commits);
             const repoConfig = {
-                url: url,
-                firstCommitSha: sha
+                owner: owner,
+                repo: repo,
+                milestones: milestones,
+                issues: issues,
+                commits: commits
             };
-            const log = changelog.createChangelog(milestones, issues, config);
-            const format = changelog.formatChangelog(log, repoConfig, config);
-            core.info(format);
+            if (milestone === 'all') {
+                const result = changelog.generateMilestoneAll(repoConfig, config);
+                core.setOutput('changelog', result);
+            }
+            else {
+                const result = changelog.generateMilestone(repoConfig, config, milestone);
+                core.setOutput('changelog', result);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
@@ -6204,29 +6212,43 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
-function getFirstCommitSha(commits) {
-    commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date));
-    return commits[0].sha;
+function generateMilestoneAll(repoConfig, config) {
+    const log = createChangelog(repoConfig.milestones, repoConfig.issues, config);
+    const format = formatChangelog(log, repoConfig, config);
+    return format;
 }
-exports.getFirstCommitSha = getFirstCommitSha;
+exports.generateMilestoneAll = generateMilestoneAll;
+function generateMilestone(repoConfig, config, number) {
+    const changelog = createChangelog(repoConfig.milestones, repoConfig.issues, config);
+    const firstSha = getFirstCommitSha(repoConfig.commits);
+    for (let i = 0; i < changelog.milestones.length; i++) {
+        const milestone = changelog.milestones[i];
+        if (milestone.number.toString() === number) {
+            const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : firstSha;
+            return formatMilestone(milestone, repoConfig, config, previousTag);
+        }
+    }
+    throw `Milestone by the specified number not found: '${number}'.`;
+}
+exports.generateMilestone = generateMilestone;
 function formatChangelog(changelog, repoConfig, config) {
+    const firstSha = getFirstCommitSha(repoConfig.commits);
     let format = '';
     format += `# ${config.header}`;
     format += `\n\r${config.description}`;
     for (let i = 0; i < changelog.milestones.length; i++) {
         const milestone = changelog.milestones[i];
-        const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : repoConfig.firstCommitSha;
+        const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : firstSha;
         format += formatMilestone(milestone, repoConfig, config, previousTag);
     }
     format += `\n\r${config.footer}`;
     return format;
 }
-exports.formatChangelog = formatChangelog;
 function formatMilestone(milestone, repoConfig, config, previousTag) {
     let format = '';
     format += `\n\r## ${milestone.name} - ${formatDate(milestone.date)}`;
-    format += `\n\r - [Commits](${repoConfig.url}/compare/${previousTag}...${milestone.name})`;
-    format += `\n\r - [Milestone](${repoConfig.url}/milestone/${milestone.number}?closed=1)`;
+    format += `\n\r - [Commits](https://github.com/${repoConfig.owner}/${repoConfig.repo}/compare/${previousTag}...${milestone.name})`;
+    format += `\n\r - [Milestone](https://github.com/${repoConfig.owner}/${repoConfig.repo}/milestone/${milestone.number}?closed=1)`;
     for (const section of milestone.sections) {
         format += formatSection(section);
     }
@@ -6257,7 +6279,6 @@ function createChangelog(milestones, issues, config) {
     changelog.milestones.sort((a, b) => b.date.getTime() - a.date.getTime());
     return changelog;
 }
-exports.createChangelog = createChangelog;
 function createMilestone(milestoneGroup, sectionConfigs) {
     const milestone = {
         name: milestoneGroup.milestone.title,
@@ -6354,6 +6375,10 @@ function formatDate(date) {
     const iso = date.toISOString();
     const index = iso.indexOf('T');
     return iso.substr(0, index);
+}
+function getFirstCommitSha(commits) {
+    commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date));
+    return commits[0].sha.substr(0, 7);
 }
 
 

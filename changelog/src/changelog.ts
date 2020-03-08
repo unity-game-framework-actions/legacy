@@ -1,8 +1,11 @@
 import * as core from '@actions/core'
 
 export type RepoConfig = {
-  url: string
-  firstCommitSha: string
+  owner: string
+  repo: string
+  milestones: MilestoneInfo[]
+  issues: IssueInfo[]
+  commits: any[]
 }
 
 export type ChangelogConfig = {
@@ -62,13 +65,32 @@ type LabelInfo = {
   name: string
 }
 
-export function getFirstCommitSha(commits: Array<any>): string {
-  commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date))
+export function generateMilestoneAll(repoConfig: RepoConfig, config: ChangelogConfig): string {
+  const log = createChangelog(repoConfig.milestones, repoConfig.issues, config)
+  const format = formatChangelog(log, repoConfig, config)
 
-  return commits[0].sha
+  return format
 }
 
-export function formatChangelog(changelog: Changelog, repoConfig: RepoConfig, config: ChangelogConfig): string {
+export function generateMilestone(repoConfig: RepoConfig, config: ChangelogConfig, number: string): string {
+  const changelog = createChangelog(repoConfig.milestones, repoConfig.issues, config)
+  const firstSha = getFirstCommitSha(repoConfig.commits)
+
+  for (let i = 0; i < changelog.milestones.length; i++) {
+    const milestone = changelog.milestones[i]
+
+    if (milestone.number.toString() === number) {
+      const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : firstSha
+
+      return formatMilestone(milestone, repoConfig, config, previousTag)
+    }
+  }
+
+  throw `Milestone by the specified number not found: '${number}'.`
+}
+
+function formatChangelog(changelog: Changelog, repoConfig: RepoConfig, config: ChangelogConfig): string {
+  const firstSha = getFirstCommitSha(repoConfig.commits)
   let format = ''
 
   format += `# ${config.header}`
@@ -76,7 +98,7 @@ export function formatChangelog(changelog: Changelog, repoConfig: RepoConfig, co
 
   for (let i = 0; i < changelog.milestones.length; i++) {
     const milestone = changelog.milestones[i]
-    const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : repoConfig.firstCommitSha
+    const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : firstSha
 
     format += formatMilestone(milestone, repoConfig, config, previousTag)
   }
@@ -90,8 +112,8 @@ function formatMilestone(milestone: ChangelogMilestone, repoConfig: RepoConfig, 
   let format = ''
 
   format += `\n\r## ${milestone.name} - ${formatDate(milestone.date)}`
-  format += `\n\r - [Commits](${repoConfig.url}/compare/${previousTag}...${milestone.name})`
-  format += `\n\r - [Milestone](${repoConfig.url}/milestone/${milestone.number}?closed=1)`
+  format += `\n\r - [Commits](https://github.com/${repoConfig.owner}/${repoConfig.repo}/compare/${previousTag}...${milestone.name})`
+  format += `\n\r - [Milestone](https://github.com/${repoConfig.owner}/${repoConfig.repo}/milestone/${milestone.number}?closed=1)`
 
   for (const section of milestone.sections) {
     format += formatSection(section)
@@ -120,7 +142,7 @@ function formatIssue(issue: IssueInfo): string {
   return format
 }
 
-export function createChangelog(milestones: MilestoneInfo[], issues: IssueInfo[], config: ChangelogConfig): Changelog {
+function createChangelog(milestones: MilestoneInfo[], issues: IssueInfo[], config: ChangelogConfig): Changelog {
   const changelog: Changelog = {
     milestones: []
   }
@@ -264,4 +286,10 @@ function formatDate(date: Date): string {
   const index = iso.indexOf('T')
 
   return iso.substr(0, index)
+}
+
+function getFirstCommitSha(commits: any[]): string {
+  commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date))
+
+  return commits[0].sha.substr(0, 7)
 }

@@ -3515,7 +3515,7 @@ run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = core.getInput('github-token');
+            const token = core.getInput('token');
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
@@ -3525,10 +3525,7 @@ function run() {
             const config = changelog.createDefaultConfig(url);
             const log = changelog.createChangelog(milestones, issues, config);
             const format = changelog.formatChangelog(log, config);
-            console.log(format);
-            console.log(JSON.stringify(log, null, 2));
-            console.log(JSON.stringify(milestones, null, 2));
-            console.log(JSON.stringify(issues, null, 2));
+            core.info(format);
         }
         catch (error) {
             core.setFailed(error.message);

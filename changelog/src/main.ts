@@ -6,7 +6,7 @@ run()
 
 async function run(): Promise<void> {
   try {
-    const token = core.getInput('github-token')
+    const token = core.getInput('token')
     const github = new GitHub(token)
     const owner = context.repo.owner
     const repo = context.repo.repo
@@ -21,10 +21,7 @@ async function run(): Promise<void> {
     const log = changelog.createChangelog(milestones, issues, config)
     const format = changelog.formatChangelog(log, config)
 
-    console.log(format)
-    console.log(JSON.stringify(log, null, 2))
-    console.log(JSON.stringify(milestones, null, 2))
-    console.log(JSON.stringify(issues, null, 2))
+    core.info(format)
   } catch (error) {
     core.setFailed(error.message)
   }

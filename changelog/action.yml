@@ -1,8 +1,8 @@
 name: 'UGF.Changelog'
 description: 'No description.'
 inputs:
-  github-token:
-    required: true
+  token:
+    default: ${{ github.token }}
 runs:
   using: 'node12'
   main: 'dist/index.js'

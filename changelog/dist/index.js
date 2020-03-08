@@ -3516,17 +3516,24 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
-            const milestonesRequest = core.getInput('milestonesRequest');
-            const issuesRequest = core.getInput('issuesRequest');
+            const milestonesRequest = core.getInput('milestones-request');
+            const issuesRequest = core.getInput('issues-request');
+            const configPath = core.getInput('config-path');
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
             const milestones = (yield github.issues.listMilestonesForRepo({ owner, repo, state: getState(milestonesRequest) })).data;
             const issues = (yield github.issues.listForRepo({ owner, repo, state: getState(issuesRequest) })).data;
+            const commits = (yield github.repos.listCommits({ owner, repo })).data;
+            const config = yield Promise.resolve().then(() => __importStar(require(configPath)));
             const url = `https://github.com/${owner}/${repo}`;
-            const config = changelog.createDefaultConfig(url);
+            const sha = changelog.getFirstCommitSha(commits);
+            const repoConfig = {
+                url: url,
+                firstCommitSha: sha
+            };
             const log = changelog.createChangelog(milestones, issues, config);
-            const format = changelog.formatChangelog(log, config);
+            const format = changelog.formatChangelog(log, repoConfig, config);
             core.info(format);
         }
         catch (error) {
@@ -6185,61 +6192,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
-function createDefaultConfig(repoUrl) {
-    return {
-        repoUrl: repoUrl,
-        header: 'Changelog',
-        description: `All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).`,
-        footer: `---
-> Unity Game Framework | Copyright 2019`,
-        sections: [
-            {
-                name: 'Added',
-                labels: ['Added']
-            },
-            {
-                name: 'Changed',
-                labels: ['Changed']
-            },
-            {
-                name: 'Deprecated',
-                labels: ['Deprecated']
-            },
-            {
-                name: 'Removed',
-                labels: ['Removed']
-            },
-            {
-                name: 'Fixed',
-                labels: ['Fixed']
-            },
-            {
-                name: 'Security',
-                labels: ['Security']
-            }
-        ]
-    };
+function getFirstCommitSha(commits) {
+    commits.sort((a, b) => a.commit.committer.data.getTime() - b.commit.committer.data.getTime());
+    return commits[0].sha;
 }
-exports.createDefaultConfig = createDefaultConfig;
-function formatChangelog(changelog, config) {
+exports.getFirstCommitSha = getFirstCommitSha;
+function formatChangelog(changelog, repoConfig, config) {
     let format = '';
     format += `# ${config.header}`;
     format += `\n\r${config.description}`;
-    for (const milestone of changelog.milestones) {
-        format += formatMilestone(milestone, config);
+    for (let i = 0; i < changelog.milestones.length; i++) {
+        const milestone = changelog.milestones[i];
+        const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : repoConfig.firstCommitSha;
+        format += formatMilestone(milestone, repoConfig, config, previousTag);
     }
     format += `\n\r${config.footer}`;
     return format;
 }
 exports.formatChangelog = formatChangelog;
-function formatMilestone(milestone, config) {
+function formatMilestone(milestone, repoConfig, config, previousTag) {
     let format = '';
     format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`;
-    format += `\n\r - [Commits](${config.repoUrl}/compare/0...${milestone.name})`;
-    format += `\n\r - [Milestone](${config.repoUrl}/milestone/${milestone.number}?closed=1)`;
+    format += `\n\r - [Commits](${repoConfig.url}/compare/${previousTag}...${milestone.name})`;
+    format += `\n\r - [Milestone](${repoConfig.url}/milestone/${milestone.number}?closed=1)`;
     for (const section of milestone.sections) {
         format += formatSection(section);
     }

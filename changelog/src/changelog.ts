@@ -1,7 +1,11 @@
 import * as core from '@actions/core'
 
+export type RepoConfig = {
+  url: string
+  firstCommitSha: string
+}
+
 export type ChangelogConfig = {
-  repoUrl: string
   header: string
   description: string
   sections: SectionConfig[]
@@ -58,53 +62,23 @@ type LabelInfo = {
   name: string
 }
 
-export function createDefaultConfig(repoUrl: string): ChangelogConfig {
-  return {
-    repoUrl: repoUrl,
-    header: 'Changelog',
-    description: `All notable changes to this project will be documented in this file.
+export function getFirstCommitSha(commits: Array<any>): string {
+  commits.sort((a, b) => a.commit.committer.data.getTime() - b.commit.committer.data.getTime())
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).`,
-    footer: `---
-> Unity Game Framework | Copyright 2019`,
-    sections: [
-      {
-        name: 'Added',
-        labels: ['Added']
-      },
-      {
-        name: 'Changed',
-        labels: ['Changed']
-      },
-      {
-        name: 'Deprecated',
-        labels: ['Deprecated']
-      },
-      {
-        name: 'Removed',
-        labels: ['Removed']
-      },
-      {
-        name: 'Fixed',
-        labels: ['Fixed']
-      },
-      {
-        name: 'Security',
-        labels: ['Security']
-      }
-    ]
-  }
+  return commits[0].sha
 }
 
-export function formatChangelog(changelog: Changelog, config: ChangelogConfig): string {
+export function formatChangelog(changelog: Changelog, repoConfig: RepoConfig, config: ChangelogConfig): string {
   let format = ''
 
   format += `# ${config.header}`
   format += `\n\r${config.description}`
 
-  for (const milestone of changelog.milestones) {
-    format += formatMilestone(milestone, config)
+  for (let i = 0; i < changelog.milestones.length; i++) {
+    const milestone = changelog.milestones[i]
+    const previousTag = i < changelog.milestones.length - 1 ? changelog.milestones[i + 1].name : repoConfig.firstCommitSha
+
+    format += formatMilestone(milestone, repoConfig, config, previousTag)
   }
 
   format += `\n\r${config.footer}`
@@ -112,12 +86,12 @@ export function formatChangelog(changelog: Changelog, config: ChangelogConfig): 
   return format
 }
 
-function formatMilestone(milestone: ChangelogMilestone, config: ChangelogConfig): string {
+function formatMilestone(milestone: ChangelogMilestone, repoConfig: RepoConfig, config: ChangelogConfig, previousTag: string): string {
   let format = ''
 
   format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`
-  format += `\n\r - [Commits](${config.repoUrl}/compare/0...${milestone.name})`
-  format += `\n\r - [Milestone](${config.repoUrl}/milestone/${milestone.number}?closed=1)`
+  format += `\n\r - [Commits](${repoConfig.url}/compare/${previousTag}...${milestone.name})`
+  format += `\n\r - [Milestone](${repoConfig.url}/milestone/${milestone.number}?closed=1)`
 
   for (const section of milestone.sections) {
     format += formatSection(section)

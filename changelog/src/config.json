@@ -1,0 +1,43 @@
+{
+  "header": "Changelog",
+  "description": "All notable changes to this project will be documented in this file.\n\r\n\rThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\n\rand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).",
+  "footer": "---\n\r> Unity Game Framework | Copyright 2020",
+  "sections": [
+    {
+      "name": "Added",
+      "labels": [
+        "Added"
+      ]
+    },
+    {
+      "name": "Changed",
+      "labels": [
+        "Changed"
+      ]
+    },
+    {
+      "name": "Deprecated",
+      "labels": [
+        "Deprecated"
+      ]
+    },
+    {
+      "name": "Removed",
+      "labels": [
+        "Removed"
+      ]
+    },
+    {
+      "name": "Fixed",
+      "labels": [
+        "Fixed"
+      ]
+    },
+    {
+      "name": "Security",
+      "labels": [
+        "Security"
+      ]
+    }
+  ]
+}

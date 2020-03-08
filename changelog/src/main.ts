@@ -11,11 +11,21 @@ async function run(): Promise<void> {
     const workspace = core.getInput('workspace')
     const milestonesRequest = core.getInput('milestones-request')
     const issuesRequest = core.getInput('issues-request')
-    const configPath = core.getInput('config-path')
+    let configPath = core.getInput('config-path')
 
     if (core.isDebug()) {
       core.debug(`Working directory: '${__dirname}'.`)
-      core.debug(`Workspace: '${workspace}'.`)
+      core.debug(`workspace: '${workspace}'.`)
+      core.debug(`milestones-request: '${milestonesRequest}'.`)
+      core.debug(`issues-request: '${issuesRequest}'.`)
+      core.debug(`configPath: '${configPath}'.`)
+    }
+
+    if (configPath == null) {
+      configPath = `${__dirname}/../res/config.json`
+
+      core.info('configPath not specified, using default config.')
+      core.debug(configPath)
     }
 
     const github = new GitHub(token)

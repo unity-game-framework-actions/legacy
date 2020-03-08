@@ -10,7 +10,7 @@ inputs:
   issues-request:
     default: closed
   config-path:
-    default: ./config.json
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

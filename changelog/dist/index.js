@@ -3520,10 +3520,18 @@ function run() {
             const workspace = core.getInput('workspace');
             const milestonesRequest = core.getInput('milestones-request');
             const issuesRequest = core.getInput('issues-request');
-            const configPath = core.getInput('config-path');
+            let configPath = core.getInput('config-path');
             if (core.isDebug()) {
                 core.debug(`Working directory: '${__dirname}'.`);
-                core.debug(`Workspace: '${workspace}'.`);
+                core.debug(`workspace: '${workspace}'.`);
+                core.debug(`milestones-request: '${milestonesRequest}'.`);
+                core.debug(`issues-request: '${issuesRequest}'.`);
+                core.debug(`configPath: '${configPath}'.`);
+            }
+            if (configPath == null) {
+                configPath = __webpack_require__.ab + "config.json";
+                core.info('configPath not specified, using default config.');
+                core.debug(__webpack_require__.ab + "config.json");
             }
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
@@ -3531,7 +3539,7 @@ function run() {
             const milestones = (yield github.issues.listMilestonesForRepo({ owner, repo, state: getState(milestonesRequest) })).data;
             const issues = (yield github.issues.listForRepo({ owner, repo, state: getState(issuesRequest) })).data;
             const commits = (yield github.repos.listCommits({ owner, repo })).data;
-            const config = JSON.parse((yield fs_1.promises.readFile(configPath)).toString());
+            const config = JSON.parse((yield fs_1.promises.readFile(__webpack_require__.ab + "config.json")).toString());
             const url = `https://github.com/${owner}/${repo}`;
             const sha = changelog.getFirstCommitSha(commits);
             const repoConfig = {

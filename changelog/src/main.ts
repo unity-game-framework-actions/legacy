@@ -7,6 +7,10 @@ run()
 
 async function run(): Promise<void> {
   try {
+    if (core.isDebug()) {
+      core.debug(`Working directory: ${__dirname}.`)
+    }
+
     const token = core.getInput('token')
     const milestonesRequest = core.getInput('milestones-request')
     const issuesRequest = core.getInput('issues-request')

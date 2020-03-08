@@ -3516,6 +3516,9 @@ run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            if (core.isDebug()) {
+                core.debug(`Working directory: ${__dirname}.`);
+            }
             const token = core.getInput('token');
             const milestonesRequest = core.getInput('milestones-request');
             const issuesRequest = core.getInput('issues-request');

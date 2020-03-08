@@ -3516,25 +3516,34 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
+            const milestonesRequest = core.getInput('milestonesRequest');
+            const issuesRequest = core.getInput('issuesRequest');
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
-            const url = 'https://github.com/' + owner + '/' + repo;
-            const milestones = (yield github.issues.listMilestonesForRepo({ owner, repo, state: 'all' })).data;
-            const issues = (yield github.issues.listForRepo({ owner, repo, state: 'all' })).data;
+            const milestones = (yield github.issues.listMilestonesForRepo({ owner, repo, state: getState(milestonesRequest) })).data;
+            const issues = (yield github.issues.listForRepo({ owner, repo, state: getState(issuesRequest) })).data;
+            const url = `https://github.com/${owner}/${repo}`;
             const config = changelog.createDefaultConfig(url);
             const log = changelog.createChangelog(milestones, issues, config);
             const format = changelog.formatChangelog(log, config);
             core.info(format);
-            if (core.isDebug()) {
-                core.debug(`Debug output`);
-                core.debug(`Changelog: ${JSON.stringify(log, null, 2)}`);
-            }
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
+}
+function getState(value) {
+    switch (value) {
+        case 'open':
+            return 'open';
+        case 'closed':
+            return 'closed';
+        case 'all':
+            return 'all';
+    }
+    return undefined;
 }
 
 
@@ -6258,7 +6267,7 @@ function createChangelog(milestones, issues, config) {
         const milestone = createMilestone(group, config.sections);
         changelog.milestones.push(milestone);
     }
-    changelog.milestones.sort((a, b) => a.date.getTime() - b.date.getTime());
+    changelog.milestones.sort((a, b) => b.date.getTime() - a.date.getTime());
     return changelog;
 }
 exports.createChangelog = createChangelog;

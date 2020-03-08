@@ -159,7 +159,7 @@ export function createChangelog(milestones: MilestoneInfo[], issues: IssueInfo[]
     changelog.milestones.push(milestone)
   }
 
-  changelog.milestones.sort((a, b) => a.date.getTime() - b.date.getTime())
+  changelog.milestones.sort((a, b) => b.date.getTime() - a.date.getTime())
 
   return changelog
 }

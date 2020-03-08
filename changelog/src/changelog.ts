@@ -229,7 +229,17 @@ function groupIssuesBySection(issues: IssueInfo[], sectionConfigs: SectionConfig
 
         group.push(issue)
 
-        core.debug(`Add issue '${issue.number}' to section '${section.name}'.`)
+        if (core.isDebug()) {
+          const label = getMatchedLabel(issue.labels, section.labels)
+
+          core.debug(`Add issue '${issue.number}' to section '${section.name}'.`)
+          core.debug(`\tMatched label '${label}'.`)
+          core.debug(`\tIssues labels:`)
+
+          for (const info of issue.labels) {
+            core.debug(`\t\t${info.name}`)
+          }
+        }
       }
     }
   }
@@ -257,9 +267,18 @@ function hasAnyLabel(labels: LabelInfo[], names: string[]): boolean {
   return false
 }
 
+function getMatchedLabel(labels: LabelInfo[], names: string[]): string | null {
+  for (const name of names) {
+    if (hasLabel(labels, name)) {
+      return name
+    }
+  }
+  return null
+}
+
 function hasLabel(labels: LabelInfo[], name: string): boolean {
   for (const label of labels) {
-    if (label.name.toLowerCase === name.toLowerCase) {
+    if (label.name === name) {
       return true
     }
   }

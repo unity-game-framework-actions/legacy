@@ -6308,7 +6308,15 @@ function groupIssuesBySection(issues, sectionConfigs) {
             if (hasAnyLabel(issue.labels, section.labels)) {
                 const group = getOrCreate(groups, section.name);
                 group.push(issue);
-                core.debug(`Add issue '${issue.number}' to section '${section.name}'.`);
+                if (core.isDebug()) {
+                    const label = getMatchedLabel(issue.labels, section.labels);
+                    core.debug(`Add issue '${issue.number}' to section '${section.name}'.`);
+                    core.debug(`\tMatched label '${label}'.`);
+                    core.debug(`\tIssues labels:`);
+                    for (const info of issue.labels) {
+                        core.debug(`\t\t${info.name}`);
+                    }
+                }
             }
         }
     }
@@ -6330,9 +6338,17 @@ function hasAnyLabel(labels, names) {
     }
     return false;
 }
+function getMatchedLabel(labels, names) {
+    for (const name of names) {
+        if (hasLabel(labels, name)) {
+            return name;
+        }
+    }
+    return null;
+}
 function hasLabel(labels, name) {
     for (const label of labels) {
-        if (label.name.toLowerCase === name.toLowerCase) {
+        if (label.name === name) {
             return true;
         }
     }

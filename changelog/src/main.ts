@@ -22,6 +22,11 @@ async function run(): Promise<void> {
     const format = changelog.formatChangelog(log, config)
 
     core.info(format)
+
+    if (core.isDebug()) {
+      core.debug(`Debug output`)
+      core.debug(`Changelog: ${JSON.stringify(log, null, 2)}`)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }

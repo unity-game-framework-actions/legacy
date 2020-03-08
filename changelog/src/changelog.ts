@@ -1,3 +1,5 @@
+import * as core from '@actions/core'
+
 export type ChangelogConfig = {
   repoUrl: string
   header: string
@@ -119,7 +121,7 @@ function formatMilestone(
 ): string {
   let format = ''
 
-  format += `\n\r## ${milestone.name} - ${milestone.date.toUTCString()}`
+  format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`
   format += `\n\r - [Commits](${config.repoUrl}/compare/0...${milestone.name})`
   format += `\n\r - [Milestone](${config.repoUrl}/milestone/${milestone.number}?closed=1)`
 
@@ -239,6 +241,8 @@ function groupIssuesBySection(
         const group = getOrCreate(groups, section.name)
 
         group.push(issue)
+
+        core.debug(`Add issue '${issue.number}' to section '${section.name}'.`)
       }
     }
   }

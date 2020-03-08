@@ -3526,6 +3526,10 @@ function run() {
             const log = changelog.createChangelog(milestones, issues, config);
             const format = changelog.formatChangelog(log, config);
             core.info(format);
+            if (core.isDebug()) {
+                core.debug(`Debug output`);
+                core.debug(`Changelog: ${JSON.stringify(log, null, 2)}`);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
@@ -6159,11 +6163,19 @@ function deprecate (message) {
 /***/ }),
 
 /***/ 375:
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
 function createDefaultConfig(repoUrl) {
     return {
         repoUrl: repoUrl,
@@ -6216,7 +6228,7 @@ function formatChangelog(changelog, config) {
 exports.formatChangelog = formatChangelog;
 function formatMilestone(milestone, config) {
     let format = '';
-    format += `\n\r## ${milestone.name} - ${milestone.date.toUTCString()}`;
+    format += `\n\r## ${milestone.name} - ${milestone.date.toISOString()}`;
     format += `\n\r - [Commits](${config.repoUrl}/compare/0...${milestone.name})`;
     format += `\n\r - [Milestone](${config.repoUrl}/milestone/${milestone.number}?closed=1)`;
     for (const section of milestone.sections) {
@@ -6293,6 +6305,7 @@ function groupIssuesBySection(issues, sectionConfigs) {
             if (hasAnyLabel(issue.labels, section.labels)) {
                 const group = getOrCreate(groups, section.name);
                 group.push(issue);
+                core.debug(`Add issue '${issue.number}' to section '${section.name}'.`);
             }
         }
     }

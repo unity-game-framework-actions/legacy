@@ -15,7 +15,8 @@ inputs:
     description: 'Milestones to generate. Possible values: 'all' or number of a milestone.'
     required: true
 output:
-  changelog: {}
+  changelog:
+    description: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

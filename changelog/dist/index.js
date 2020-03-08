@@ -6208,43 +6208,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 exports.createDefaultConfig = createDefaultConfig;
 function formatChangelog(changelog, config) {
     let format = '';
-    const lineEnd = '\n\r';
-    format += '# ' + config.header + lineEnd;
-    format += config.description + lineEnd;
+    format += `# ${config.header}`;
+    format += `\n\r${config.description}`;
     for (const milestone of changelog.milestones) {
         format += formatMilestone(milestone, config);
     }
-    format += config.footer + lineEnd;
+    format += `\n\r${config.footer}`;
     return format;
 }
 exports.formatChangelog = formatChangelog;
 function formatMilestone(milestone, config) {
     let format = '';
-    const lineEnd = '\n\r';
-    format += '## ' + milestone.name + ' - ' + milestone.date.toISOString() + lineEnd;
-    format += ' - [Commits](' + config.repoUrl + '/compare/0...' + milestone.name + ')' + lineEnd;
-    format += ' - [Milestone](' + config.repoUrl + '/milestone/' + milestone.number + '?closed=1)' + lineEnd;
+    format += `\n\r## ${milestone.name} - ${milestone.date.toUTCString()}`;
+    format += `\n\r - [Commits](${config.repoUrl}/compare/0...${milestone.name})`;
+    format += `\n\r - [Milestone](${config.repoUrl}/milestone/${milestone.number}?closed=1)`;
     for (const section of milestone.sections) {
         format += formatSection(section);
     }
-    format += lineEnd;
     return format;
 }
 function formatSection(section) {
     let format = '';
-    const lineEnd = '\n\r';
-    format += '### ' + section.name + lineEnd;
+    format += `\n\r### ${section.name}`;
     for (const issue of section.issues) {
         format += formatIssue(issue);
     }
-    format += lineEnd;
     return format;
 }
 function formatIssue(issue) {
     let format = '';
-    const lineEnd = '\n\r';
-    format += ' - ' + issue.title + ' (#' + issue.number + ')';
-    format += lineEnd;
+    format += `\n\r - ${issue.title} (#${issue.number})`;
     return format;
 }
 function createChangelog(milestones, issues, config) {
@@ -6316,9 +6309,9 @@ function getOrCreate(map, key) {
     }
     return result;
 }
-function hasAnyLabel(labels, targets) {
-    for (const label of targets) {
-        if (hasLabel(labels, label)) {
+function hasAnyLabel(labels, names) {
+    for (const name of names) {
+        if (hasLabel(labels, name)) {
             return true;
         }
     }
@@ -6326,7 +6319,7 @@ function hasAnyLabel(labels, targets) {
 }
 function hasLabel(labels, name) {
     for (const label of labels) {
-        if (label.name.toLowerCase == name.toLowerCase) {
+        if (label.name.toLowerCase === name.toLowerCase) {
             return true;
         }
     }

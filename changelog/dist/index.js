@@ -6287,9 +6287,15 @@ function createMilestone(milestoneGroup, sectionConfigs) {
     const milestone = {
         name: milestoneGroup.milestone.title,
         number: milestoneGroup.milestone.number,
-        date: new Date(milestoneGroup.milestone.closed_at),
+        date: new Date(),
         sections: []
     };
+    if (milestoneGroup.milestone.due_on !== null) {
+        milestone.date = new Date(milestoneGroup.milestone.due_on);
+    }
+    else {
+        milestone.date = new Date(milestoneGroup.milestone.closed_at);
+    }
     core.debug(`Create milestone '${milestoneGroup.milestone.number}'.`);
     const issues = groupIssuesBySection(milestoneGroup.issues, sectionConfigs);
     issues.forEach((value, key) => {

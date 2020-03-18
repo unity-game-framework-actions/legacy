@@ -59,6 +59,7 @@ type MilestoneInfo = {
   title: string
   description: string
   closed_at: string
+  due_on: string
 }
 
 type LabelInfo = {
@@ -164,8 +165,14 @@ function createMilestone(milestoneGroup: MilestoneGroupInfo, sectionConfigs: Sec
   const milestone: ChangelogMilestone = {
     name: milestoneGroup.milestone.title,
     number: milestoneGroup.milestone.number,
-    date: new Date(milestoneGroup.milestone.closed_at),
+    date: new Date(),
     sections: []
+  }
+
+  if (milestoneGroup.milestone.due_on !== null) {
+    milestone.date = new Date(milestoneGroup.milestone.due_on)
+  } else {
+    milestone.date = new Date(milestoneGroup.milestone.closed_at)
   }
 
   core.debug(`Create milestone '${milestoneGroup.milestone.number}'.`)

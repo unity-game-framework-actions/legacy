@@ -31,6 +31,12 @@ async function run(): Promise<void> {
     const owner = context.repo.owner
     const repo = context.repo.repo
 
+    const test1 = await github.paginate(`GET /repos/dotnet/runtime/issues`);
+    const test2 = (await github.issues.listForRepo({owner:"dotnet", repo:"runtime", state: getState(issuesRequest)})).data
+
+    core.debug(`test1: ${test1.length}`);
+    core.debug(`test2: ${test2.length}`);
+
     const milestones = (await github.issues.listMilestonesForRepo({owner, repo, state: getState(milestonesRequest)})).data
     const issues = (await github.issues.listForRepo({owner, repo, state: getState(issuesRequest)})).data
     const commits = (await github.repos.listCommits({owner, repo})).data

@@ -3518,8 +3518,8 @@ function run() {
         try {
             const token = core.getInput('token');
             const workspace = core.getInput('workspace');
-            const milestonesRequest = core.getInput('milestones-request');
-            const issuesRequest = core.getInput('issues-request');
+            const requestMilestoneState = core.getInput('request-milestones-state');
+            const requestIssuesState = core.getInput('request-issues-state');
             let configPath = core.getInput('config-path');
             const milestone = core.getInput('milestone');
             if (configPath === null) {
@@ -3528,28 +3528,25 @@ function run() {
             if (core.isDebug()) {
                 core.debug(`Working directory: '${__dirname}'.`);
                 core.debug(`Input workspace: '${workspace}'.`);
-                core.debug(`Input milestones-request: '${milestonesRequest}'.`);
-                core.debug(`Input issues-request: '${issuesRequest}'.`);
+                core.debug(`Input request-milestones-state: '${requestMilestoneState}'.`);
+                core.debug(`Input request-issues-state: '${requestIssuesState}'.`);
                 core.debug(`Input config-path: '${configPath}'.`);
                 core.debug(`Input milestone: '${milestone}'.`);
             }
             const github = new github_1.GitHub(token);
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
-            const test1 = yield github.paginate(`GET /repos/dotnet/runtime/issues`);
-            const test2 = (yield github.issues.listForRepo({ owner: 'dotnet', repo: 'runtime', state: getState(issuesRequest) })).data;
-            core.debug(`test1: ${test1.length}`);
-            core.debug(`test2: ${test2.length}`);
-            const milestones = (yield github.issues.listMilestonesForRepo({ owner, repo, state: getState(milestonesRequest) })).data;
-            const issues = (yield github.issues.listForRepo({ owner, repo, state: getState(issuesRequest) })).data;
-            const commits = (yield github.repos.listCommits({ owner, repo })).data;
+            const url = `GET /repos/${owner}/${repo}`;
+            const milestones = yield github.paginate(`${url}/milestones?state=${requestMilestoneState}`);
+            const issues = yield github.paginate(`${url}/issues?state=${requestMilestoneState}`);
+            const commits = yield github.paginate(`${url}/commits`);
             const config = JSON.parse((yield fs_1.promises.readFile(__webpack_require__.ab + "config.json")).toString());
             const repoConfig = {
                 owner: owner,
                 repo: repo,
                 milestones: milestones,
                 issues: issues,
-                commits: commits
+                firstCommitSha: commits[commits.length - 1]
             };
             if (milestone === 'all') {
                 const result = changelog.generateMilestoneAll(repoConfig, config);
@@ -6224,7 +6221,7 @@ function generateMilestoneAll(repoConfig, config) {
 exports.generateMilestoneAll = generateMilestoneAll;
 function generateMilestone(repoConfig, config, number) {
     const changelog = createChangelog(repoConfig.milestones, repoConfig.issues, config);
-    const firstSha = getFirstCommitSha(repoConfig.commits);
+    const firstSha = formatCommitSha(repoConfig.firstCommitSha);
     for (let i = 0; i < changelog.milestones.length; i++) {
         const milestone = changelog.milestones[i];
         if (milestone.number.toString() === number) {
@@ -6236,7 +6233,7 @@ function generateMilestone(repoConfig, config, number) {
 }
 exports.generateMilestone = generateMilestone;
 function formatChangelog(changelog, repoConfig, config) {
-    const firstSha = getFirstCommitSha(repoConfig.commits);
+    const firstSha = formatCommitSha(repoConfig.firstCommitSha);
     let format = '';
     format += `# ${config.header}`;
     format += `\n\r${config.description}`;
@@ -6299,14 +6296,20 @@ function createMilestone(milestoneGroup, sectionConfigs) {
     core.debug(`Create milestone '${milestoneGroup.milestone.number}'.`);
     const issues = groupIssuesBySection(milestoneGroup.issues, sectionConfigs);
     issues.forEach((value, key) => {
+        const sectionConfig = sectionConfigs.find(x => x.type === key);
+        if (sectionConfig == undefined) {
+            throw `Section not found by type: '${key}'.`;
+        }
         const section = {
-            name: key,
+            type: key,
+            order: sectionConfig.order,
+            name: sectionConfig.name,
             issues: value
         };
         section.issues.sort((a, b) => a.title.localeCompare(b.title));
         milestone.sections.push(section);
     });
-    milestone.sections.sort((a, b) => a.name.localeCompare(b.name));
+    milestone.sections.sort((a, b) => a.order - b.order);
     return milestone;
 }
 function getMilestoneGroups(milestones, issues) {
@@ -6332,12 +6335,12 @@ function groupIssuesBySection(issues, sectionConfigs) {
     const groups = new Map();
     for (const issue of issues) {
         for (const section of sectionConfigs) {
-            if (hasAnyLabel(issue.labels, section.labels)) {
-                const group = getOrCreate(groups, section.name);
+            if (getMatchedLabel(issue.labels, section.labels) != null) {
+                const group = getOrCreate(groups, section.type);
                 group.push(issue);
                 if (core.isDebug()) {
                     const label = getMatchedLabel(issue.labels, section.labels);
-                    core.debug(`Add issue '${issue.number}' to section '${section.name}'.`);
+                    core.debug(`Add issue '${issue.number}' to section '${section.type}', '${section.name}'.`);
                     core.debug(`\tMatched label '${label}'.`);
                     core.debug(`\tIssues labels:`);
                     for (const info of issue.labels) {
@@ -6357,38 +6360,21 @@ function getOrCreate(map, key) {
     }
     return result;
 }
-function hasAnyLabel(labels, names) {
-    for (const name of names) {
-        if (hasLabel(labels, name)) {
-            return true;
-        }
-    }
-    return false;
-}
 function getMatchedLabel(labels, names) {
     for (const name of names) {
-        if (hasLabel(labels, name)) {
+        if (labels.findIndex(x => x.name === name) > -1) {
             return name;
         }
     }
     return null;
-}
-function hasLabel(labels, name) {
-    for (const label of labels) {
-        if (label.name === name) {
-            return true;
-        }
-    }
-    return false;
 }
 function formatDate(date) {
     const iso = date.toISOString();
     const index = iso.indexOf('T');
     return iso.substr(0, index);
 }
-function getFirstCommitSha(commits) {
-    commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date));
-    return commits[0].sha.substr(0, 7);
+function formatCommitSha(sha) {
+    return sha.substr(0, 7);
 }
 
 

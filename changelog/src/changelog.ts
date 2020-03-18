@@ -5,7 +5,7 @@ export type RepoConfig = {
   repo: string
   milestones: MilestoneInfo[]
   issues: IssueInfo[]
-  commits: any[]
+  firstCommitSha: string
 }
 
 export type ChangelogConfig = {
@@ -16,6 +16,8 @@ export type ChangelogConfig = {
 }
 
 export type SectionConfig = {
+  type: string
+  order: number
   name: string
   labels: string[]
 }
@@ -32,6 +34,8 @@ type ChangelogMilestone = {
 }
 
 type ChangelogSection = {
+  type: string
+  order: number
   name: string
   issues: IssueInfo[]
 }
@@ -75,7 +79,7 @@ export function generateMilestoneAll(repoConfig: RepoConfig, config: ChangelogCo
 
 export function generateMilestone(repoConfig: RepoConfig, config: ChangelogConfig, number: string): string {
   const changelog = createChangelog(repoConfig.milestones, repoConfig.issues, config)
-  const firstSha = getFirstCommitSha(repoConfig.commits)
+  const firstSha = formatCommitSha(repoConfig.firstCommitSha)
 
   for (let i = 0; i < changelog.milestones.length; i++) {
     const milestone = changelog.milestones[i]
@@ -91,7 +95,7 @@ export function generateMilestone(repoConfig: RepoConfig, config: ChangelogConfi
 }
 
 function formatChangelog(changelog: Changelog, repoConfig: RepoConfig, config: ChangelogConfig): string {
-  const firstSha = getFirstCommitSha(repoConfig.commits)
+  const firstSha = formatCommitSha(repoConfig.firstCommitSha)
   let format = ''
 
   format += `# ${config.header}`
@@ -180,8 +184,16 @@ function createMilestone(milestoneGroup: MilestoneGroupInfo, sectionConfigs: Sec
   const issues = groupIssuesBySection(milestoneGroup.issues, sectionConfigs)
 
   issues.forEach((value, key) => {
+    const sectionConfig = sectionConfigs.find(x => x.type === key)
+
+    if (sectionConfig == undefined) {
+      throw `Section not found by type: '${key}'.`
+    }
+
     const section: ChangelogSection = {
-      name: key,
+      type: key,
+      order: sectionConfig.order,
+      name: sectionConfig.name,
       issues: value
     }
 
@@ -190,7 +202,7 @@ function createMilestone(milestoneGroup: MilestoneGroupInfo, sectionConfigs: Sec
     milestone.sections.push(section)
   })
 
-  milestone.sections.sort((a, b) => a.name.localeCompare(b.name))
+  milestone.sections.sort((a, b) => a.order - b.order)
 
   return milestone
 }
@@ -227,15 +239,15 @@ function groupIssuesBySection(issues: IssueInfo[], sectionConfigs: SectionConfig
 
   for (const issue of issues) {
     for (const section of sectionConfigs) {
-      if (hasAnyLabel(issue.labels, section.labels)) {
-        const group = getOrCreate(groups, section.name)
+      if (getMatchedLabel(issue.labels, section.labels) != null) {
+        const group = getOrCreate(groups, section.type)
 
         group.push(issue)
 
         if (core.isDebug()) {
           const label = getMatchedLabel(issue.labels, section.labels)
 
-          core.debug(`Add issue '${issue.number}' to section '${section.name}'.`)
+          core.debug(`Add issue '${issue.number}' to section '${section.type}', '${section.name}'.`)
           core.debug(`\tMatched label '${label}'.`)
           core.debug(`\tIssues labels:`)
 
@@ -261,31 +273,13 @@ function getOrCreate<TKey, TArray>(map: Map<TKey, TArray[]>, key: TKey): TArray[
   return result
 }
 
-function hasAnyLabel(labels: LabelInfo[], names: string[]): boolean {
-  for (const name of names) {
-    if (hasLabel(labels, name)) {
-      return true
-    }
-  }
-  return false
-}
-
 function getMatchedLabel(labels: LabelInfo[], names: string[]): string | null {
   for (const name of names) {
-    if (hasLabel(labels, name)) {
+    if (labels.findIndex(x => x.name === name) > -1) {
       return name
     }
   }
   return null
-}
-
-function hasLabel(labels: LabelInfo[], name: string): boolean {
-  for (const label of labels) {
-    if (label.name === name) {
-      return true
-    }
-  }
-  return false
 }
 
 function formatDate(date: Date): string {
@@ -295,8 +289,6 @@ function formatDate(date: Date): string {
   return iso.substr(0, index)
 }
 
-function getFirstCommitSha(commits: any[]): string {
-  commits.sort((a, b) => a.commit.committer.date.localeCompare(b.commit.committer.date))
-
-  return commits[0].sha.substr(0, 7)
+function formatCommitSha(sha: string): string {
+  return sha.substr(0, 7)
 }

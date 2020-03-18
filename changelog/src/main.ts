@@ -9,8 +9,8 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const workspace = core.getInput('workspace')
-    const milestonesRequest = core.getInput('milestones-request')
-    const issuesRequest = core.getInput('issues-request')
+    const requestMilestoneState = core.getInput('request-milestones-state')
+    const requestIssuesState = core.getInput('request-issues-state')
     let configPath = core.getInput('config-path')
     const milestone = core.getInput('milestone')
 
@@ -21,8 +21,8 @@ async function run(): Promise<void> {
     if (core.isDebug()) {
       core.debug(`Working directory: '${__dirname}'.`)
       core.debug(`Input workspace: '${workspace}'.`)
-      core.debug(`Input milestones-request: '${milestonesRequest}'.`)
-      core.debug(`Input issues-request: '${issuesRequest}'.`)
+      core.debug(`Input request-milestones-state: '${requestMilestoneState}'.`)
+      core.debug(`Input request-issues-state: '${requestIssuesState}'.`)
       core.debug(`Input config-path: '${configPath}'.`)
       core.debug(`Input milestone: '${milestone}'.`)
     }
@@ -30,16 +30,11 @@ async function run(): Promise<void> {
     const github = new GitHub(token)
     const owner = context.repo.owner
     const repo = context.repo.repo
+    const url = `GET /repos/${owner}/${repo}`
 
-    const test1 = await github.paginate(`GET /repos/dotnet/runtime/issues`)
-    const test2 = (await github.issues.listForRepo({owner: 'dotnet', repo: 'runtime', state: getState(issuesRequest)})).data
-
-    core.debug(`test1: ${test1.length}`)
-    core.debug(`test2: ${test2.length}`)
-
-    const milestones = (await github.issues.listMilestonesForRepo({owner, repo, state: getState(milestonesRequest)})).data
-    const issues = (await github.issues.listForRepo({owner, repo, state: getState(issuesRequest)})).data
-    const commits = (await github.repos.listCommits({owner, repo})).data
+    const milestones = await github.paginate(`${url}/milestones?state=${requestMilestoneState}`)
+    const issues = await github.paginate(`${url}/issues?state=${requestMilestoneState}`)
+    const commits = await github.paginate(`${url}/commits`)
     const config = JSON.parse((await fs.readFile(configPath)).toString())
 
     const repoConfig: changelog.RepoConfig = {
@@ -47,7 +42,7 @@ async function run(): Promise<void> {
       repo: repo,
       milestones: milestones,
       issues: issues,
-      commits: commits
+      firstCommitSha: commits[commits.length - 1]
     }
 
     if (milestone === 'all') {

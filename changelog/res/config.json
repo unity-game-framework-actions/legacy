@@ -4,36 +4,48 @@
   "footer": "---\n\r> Unity Game Framework | Copyright 2020",
   "sections": [
     {
+      "type": "added",
+      "order": 0,
       "name": "Added",
       "labels": [
         "Added"
       ]
     },
     {
+      "type": "changed",
+      "order": 1,
       "name": "Changed",
       "labels": [
         "Changed"
       ]
     },
     {
+      "type": "deprecated",
+      "order": 2,
       "name": "Deprecated",
       "labels": [
         "Deprecated"
       ]
     },
     {
+      "type": "removed",
+      "order": 3,
       "name": "Removed",
       "labels": [
         "Removed"
       ]
     },
     {
+      "type": "fixed",
+      "order": 4,
       "name": "Fixed",
       "labels": [
         "Fixed"
       ]
     },
     {
+      "type": "security",
+      "order": 5,
       "name": "Security",
       "labels": [
         "Security"

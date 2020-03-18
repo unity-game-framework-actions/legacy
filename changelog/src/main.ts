@@ -42,7 +42,7 @@ async function run(): Promise<void> {
       repo: repo,
       milestones: milestones,
       issues: issues,
-      firstCommitSha: commits[commits.length - 1]
+      firstCommitSha: commits[commits.length - 1].sha
     }
 
     if (milestone === 'all') {

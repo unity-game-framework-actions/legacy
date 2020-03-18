@@ -3546,7 +3546,7 @@ function run() {
                 repo: repo,
                 milestones: milestones,
                 issues: issues,
-                firstCommitSha: commits[commits.length - 1]
+                firstCommitSha: commits[commits.length - 1].sha
             };
             if (milestone === 'all') {
                 const result = changelog.generateMilestoneAll(repoConfig, config);

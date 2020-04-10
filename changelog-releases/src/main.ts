@@ -34,6 +34,10 @@ async function createChangelogContent(github: GitHub, header: string): Promise<s
 
   const content = formatReleaseAll(releases, header)
 
+  if (core.isDebug()) {
+    core.debug(JSON.stringify(releases))
+  }
+
   return content
 }
 

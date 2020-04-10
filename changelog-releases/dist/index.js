@@ -3546,6 +3546,9 @@ function createChangelogContent(github, header) {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
         releases.sort((a, b) => b.name.localeCompare(a.name));
         const content = formatReleaseAll(releases, header);
+        if (core.isDebug()) {
+            core.debug(JSON.stringify(releases));
+        }
         return content;
     });
 }

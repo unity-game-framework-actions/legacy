@@ -1,0 +1,5 @@
+name: 'UGF.Changelog.Milestone'
+description: 'No description.'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

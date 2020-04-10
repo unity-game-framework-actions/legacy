@@ -75,7 +75,7 @@ function formatReleaseAll(releases: any[], header: string): string {
 }
 
 function formatRelease(release: any): string {
-  const name = release.name != null ? release.name : release.tag_name
+  const name = release.name !== '' ? release.name : release.tag_name
   const date = formatDate(release.published_at)
   const body = release.body
 

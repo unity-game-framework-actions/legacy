@@ -3583,7 +3583,7 @@ function formatReleaseAll(releases, header) {
     return format;
 }
 function formatRelease(release) {
-    const name = release.name != null ? release.name : release.tag_name;
+    const name = release.name !== '' ? release.name : release.tag_name;
     const date = formatDate(release.published_at);
     const body = release.body;
     return `## ${name} - ${date}\r\n${body}\r\n\r\n`;

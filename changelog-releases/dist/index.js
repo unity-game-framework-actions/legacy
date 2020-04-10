@@ -3544,7 +3544,7 @@ function run() {
 function createChangelogContent(github, header) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
-        releases.sort((a, b) => a.name.localeCompare(b.name));
+        releases.sort((a, b) => b.name.localeCompare(a.name));
         const content = formatReleaseAll(releases, header);
         return content;
     });
@@ -3552,7 +3552,7 @@ function createChangelogContent(github, header) {
 function updateChangelogContent(github, content, contentName, message, userName, userEmail) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${contentName}`);
-        const base64 = new Buffer(content).toString('base64');
+        const base64 = Buffer.from(content).toString('base64');
         const sha = response.data.sha;
         yield github.repos.createOrUpdateFile({
             owner: github_1.context.repo.owner,

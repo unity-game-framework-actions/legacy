@@ -30,7 +30,7 @@ async function run(): Promise<void> {
 async function createChangelogContent(github: GitHub, header: string): Promise<string> {
   const releases = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/releases`)
 
-  releases.sort((a, b) => a.name.localeCompare(b.name))
+  releases.sort((a, b) => b.name.localeCompare(a.name))
 
   const content = formatReleaseAll(releases, header)
 
@@ -39,7 +39,7 @@ async function createChangelogContent(github: GitHub, header: string): Promise<s
 
 async function updateChangelogContent(github: GitHub, content: string, contentName: string, message: string, userName: string, userEmail: string): Promise<void> {
   const response = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${contentName}`)
-  const base64 = new Buffer(content).toString('base64')
+  const base64 = Buffer.from(content).toString('base64')
   const sha = response.data.sha
 
   await github.repos.createOrUpdateFile({

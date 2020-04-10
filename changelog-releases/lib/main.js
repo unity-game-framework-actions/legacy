@@ -73,7 +73,7 @@ function updateChangelogContent(github, content, contentName, message, userName,
     });
 }
 function formatReleaseAll(releases, header) {
-    let format = header;
+    let format = `${header}\n\n`;
     for (const release of releases) {
         format += formatRelease(release);
     }
@@ -83,7 +83,7 @@ function formatRelease(release) {
     const name = release.name;
     const date = formatDate(release.published_at);
     const body = release.body;
-    return `## ${name} - ${date}\n${body}`;
+    return `## ${name} - ${date}\n${body}\n\n`;
 }
 function formatDate(date) {
     const index = date.indexOf('T');

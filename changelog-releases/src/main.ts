@@ -61,7 +61,7 @@ async function updateChangelogContent(github: GitHub, content: string, contentNa
 }
 
 function formatReleaseAll(releases: any[], header: string): string {
-  let format = header
+  let format = `${header}\n\n`
 
   for (const release of releases) {
     format += formatRelease(release)
@@ -75,7 +75,7 @@ function formatRelease(release: any): string {
   const date = formatDate(release.published_at)
   const body = release.body
 
-  return `## ${name} - ${date}\n${body}`
+  return `## ${name} - ${date}\n${body}\n\n`
 }
 
 function formatDate(date: string): string {

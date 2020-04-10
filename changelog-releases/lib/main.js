@@ -46,7 +46,7 @@ function createChangelogContent(github, header) {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
         releases.sort((a, b) => a.name.localeCompare(b.name));
         const content = formatReleaseAll(releases, header);
-        return Promise.resolve(content);
+        return content;
     });
 }
 function updateChangelogContent(github, content, contentName, message, userName, userEmail) {

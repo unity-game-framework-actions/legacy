@@ -1,7 +1,7 @@
 {
-  "name": "ugf-draft-ts",
+  "name": "ugf-changelog-milestone",
   "version": "0.0.0",
-  "description": "UGF.Draft.TypeScript",
+  "description": "UGF.Changelog.Milestone",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -24,7 +24,8 @@
   "homepage": "https://github.com/unity-game-framework/ugf-github-actions#readme.md",
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@actions/github": "^2.1.1"
+    "@actions/github": "^2.1.1",
+    "@types/js-yaml": "^3.12.3"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",

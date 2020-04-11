@@ -1,0 +1,57 @@
+
+name: Changelog
+
+on:
+  milestone:
+    types: [closed]
+  
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Changelog All
+        uses: unity-game-framework/ugf-github-actions/changelog@develop
+        id: all
+        with:
+          milestone: 'all'
+      - name: Generate Changelog Single
+        uses: unity-game-framework/ugf-github-actions/changelog@develop
+        id: single
+        with:
+          milestone: ${{ github.event.milestone.number }}
+      - name: Commit Changelog All
+        uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/changelog.md`)
+
+            const content = `${{ steps.all.outputs.changelog }}`
+            const base64 = new Buffer(content).toString('base64')
+            const sha = response.data.sha
+
+            await github.repos.createOrUpdateFile({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: "changelog.md",
+              message: "Update changelog",
+              content: base64,
+              sha: sha,
+              committer: {
+                name: "GitHub Action",
+                email: "action@github.com"
+              },
+              author: {
+                name: "GitHub Action",
+                email: "action@github.com"
+              }
+            })
+      - name: Release
+        uses: actions/create-release@latest
+        with:
+          tag_name: ${{ github.event.milestone.title }}
+          release_name: ${{ github.event.milestone.title }}
+          body: ${{ steps.single.outputs.changelog }}

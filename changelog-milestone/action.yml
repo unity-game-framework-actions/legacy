@@ -1,0 +1,15 @@
+name: 'UGF.Changelog.Milestone'
+description: 'No description.'
+inputs:
+  token:
+    default: ${{ github.token }}
+  milestone:
+    required: true
+  config:
+    default: .github/changelog.yml
+output:
+  content:
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

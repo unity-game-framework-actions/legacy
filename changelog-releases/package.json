@@ -1,7 +1,7 @@
 {
-  "name": "ugf-draft-ts",
+  "name": "ugf-changelog-releases",
   "version": "0.0.0",
-  "description": "UGF.Draft.TypeScript",
+  "description": "UGF.Changelog.Releases",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",

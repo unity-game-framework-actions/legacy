@@ -3535,13 +3535,19 @@ function run() {
         }
     });
 }
-function createChangelogContent(github, milestone, groupLabels) {
+function createChangelogContent(github, milestoneNumber, groupLabels) {
     return __awaiter(this, void 0, void 0, function* () {
-        const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=closed`);
+        const milestone = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestoneNumber}`);
+        const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestoneNumber}&state=closed`);
         const map = getIssueGroupsMap(issues, groupLabels);
         const groups = getIssueGroups(map);
-        const content = formatIssues(groups);
-        return content;
+        let content = '';
+        content += ` - [Milestone](${milestone.html_url})\r\n`;
+        if (milestone.description !== '') {
+            content += `<br/>${milestone.description}\r\n`;
+        }
+        content += formatIssues(groups);
+        return ``;
     });
 }
 function formatIssues(groups) {

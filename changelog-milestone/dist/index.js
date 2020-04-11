@@ -3535,24 +3535,29 @@ function run() {
         }
     });
 }
-function createChangelogContent(github, milestoneNumber, groupLabels) {
+function createChangelogContent(github, milestone, groupLabels) {
     return __awaiter(this, void 0, void 0, function* () {
-        const milestone = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestoneNumber}`);
-        const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestoneNumber}&state=closed`);
+        const milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestone}`);
+        const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=closed`);
         const map = getIssueGroupsMap(issues, groupLabels);
         const groups = getIssueGroups(map);
         let content = '';
-        content += ` - [Milestone](${milestone.html_url})\r\n`;
-        if (milestone.description !== '') {
-            content += `<br/>${milestone.description}\r\n`;
-        }
+        content += formatMilestone(milestones[0]);
         content += formatIssues(groups);
         if (core.isDebug()) {
-            core.debug(`Milestone: ${JSON.stringify(milestone)}`);
+            core.debug(`Milestones: ${JSON.stringify(milestones)}`);
             core.debug(`Issues: ${JSON.stringify(issues)}`);
         }
         return content;
     });
+}
+function formatMilestone(milestone) {
+    let format = '';
+    format += ` - [Milestone](${milestone.html_url})\r\n`;
+    if (milestone.description !== '') {
+        format += `<br/>${milestone.description}\r\n`;
+    }
+    return format;
 }
 function formatIssues(groups) {
     let format = '';

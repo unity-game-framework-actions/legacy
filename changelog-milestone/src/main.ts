@@ -20,27 +20,34 @@ async function run(): Promise<void> {
   }
 }
 
-async function createChangelogContent(github: GitHub, milestoneNumber: string, groupLabels: any[]): Promise<string> {
-  const milestone: any = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestoneNumber}`)
-  const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestoneNumber}&state=closed`)
+async function createChangelogContent(github: GitHub, milestone: string, groupLabels: any[]): Promise<string> {
+  const milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestone}`)
+  const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone}&state=closed`)
   const map = getIssueGroupsMap(issues, groupLabels)
   const groups = getIssueGroups(map)
   let content = ''
 
-  content += ` - [Milestone](${milestone.html_url})\r\n`
-
-  if (milestone.description !== '') {
-    content += `<br/>${milestone.description}\r\n`
-  }
-
+  content += formatMilestone(milestones[0])
   content += formatIssues(groups)
 
   if (core.isDebug()) {
-    core.debug(`Milestone: ${JSON.stringify(milestone)}`)
+    core.debug(`Milestones: ${JSON.stringify(milestones)}`)
     core.debug(`Issues: ${JSON.stringify(issues)}`)
   }
 
   return content
+}
+
+function formatMilestone(milestone: any): string {
+  let format = ''
+
+  format += ` - [Milestone](${milestone.html_url})\r\n`
+
+  if (milestone.description !== '') {
+    format += `<br/>${milestone.description}\r\n`
+  }
+
+  return format
 }
 
 function formatIssues(groups: any[]): string {

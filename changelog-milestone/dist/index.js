@@ -3538,7 +3538,7 @@ function run() {
 function createChangelogContent(github, milestone, groupLabels) {
     return __awaiter(this, void 0, void 0, function* () {
         const milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestone}`);
-        const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=closed`);
+        const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=all`);
         const map = getIssueGroupsMap(issues, groupLabels);
         const groups = getIssueGroups(map);
         let content = '';

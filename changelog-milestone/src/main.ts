@@ -31,10 +31,12 @@ async function createChangelogContent(github: GitHub, milestone: string, config:
   for (const group of config) {
     const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone}&state=all&labels=${group.labels}`)
 
-    groups.push({
-      name: group.name,
-      issues: issues
-    })
+    if (issues.length > 0) {
+      groups.push({
+        name: group.name,
+        issues: issues
+      })
+    }
   }
 
   content += formatMilestone(milestones[0])

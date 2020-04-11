@@ -4144,10 +4144,12 @@ function createChangelogContent(github, milestone, config) {
         const groups = [];
         for (const group of config) {
             const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=all&labels=${group.labels}`);
-            groups.push({
-                name: group.name,
-                issues: issues
-            });
+            if (issues.length > 0) {
+                groups.push({
+                    name: group.name,
+                    issues: issues
+                });
+            }
         }
         content += formatMilestone(milestones[0]);
         content += formatIssues(groups);

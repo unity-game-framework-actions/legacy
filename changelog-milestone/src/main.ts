@@ -35,6 +35,11 @@ async function createChangelogContent(github: GitHub, milestoneNumber: string, g
 
   content += formatIssues(groups)
 
+  if (core.isDebug()) {
+    core.debug(`Milestone: ${JSON.stringify(milestone)}`)
+    core.debug(`Issues: ${JSON.stringify(issues)}`)
+  }
+
   return content
 }
 

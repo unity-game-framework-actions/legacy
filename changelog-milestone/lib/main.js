@@ -47,6 +47,10 @@ function createChangelogContent(github, milestoneNumber, groupLabels) {
             content += `<br/>${milestone.description}\r\n`;
         }
         content += formatIssues(groups);
+        if (core.isDebug()) {
+            core.debug(`Milestone: ${JSON.stringify(milestone)}`);
+            core.debug(`Issues: ${JSON.stringify(issues)}`);
+        }
         return content;
     });
 }

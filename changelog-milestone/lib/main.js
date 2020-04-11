@@ -47,7 +47,7 @@ function createChangelogContent(github, milestoneNumber, groupLabels) {
             content += `<br/>${milestone.description}\r\n`;
         }
         content += formatIssues(groups);
-        return ``;
+        return content;
     });
 }
 function formatIssues(groups) {

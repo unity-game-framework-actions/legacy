@@ -35,7 +35,7 @@ async function createChangelogContent(github: GitHub, milestoneNumber: string, g
 
   content += formatIssues(groups)
 
-  return ``
+  return content
 }
 
 function formatIssues(groups: any[]): string {

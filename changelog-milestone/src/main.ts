@@ -7,12 +7,12 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const milestone = core.getInput('milestone')
-    const groupsConfig = core.getInput('groups-config2')
+    const config = core.getInput('config')
 
     const github = new GitHub(token)
-    const config = JSON.parse(groupsConfig)
+    const groups = JSON.parse(config)
 
-    const content = await createChangelogContent2(github, milestone, config)
+    const content = await createChangelogContent(github, milestone, groups)
 
     core.setOutput('content', content)
   } catch (error) {
@@ -20,12 +20,12 @@ async function run(): Promise<void> {
   }
 }
 
-async function createChangelogContent2(github: GitHub, milestone: string, groupConfig: any[]): Promise<string> {
+async function createChangelogContent(github: GitHub, milestone: string, config: any[]): Promise<string> {
   let content = ''
   const milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestone}`)
   const groups = []
 
-  for (const group of groupConfig) {
+  for (const group of config) {
     const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone}&state=all&labels=${group.labels}`)
 
     groups.push({
@@ -40,31 +40,13 @@ async function createChangelogContent2(github: GitHub, milestone: string, groupC
   return content
 }
 
-async function createChangelogContent(github: GitHub, milestone: string, groupLabels: any[]): Promise<string> {
-  const milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestone}`)
-  const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone}&state=all`)
-  const map = getIssueGroupsMap(issues, groupLabels)
-  const groups = getIssueGroups(map)
-  let content = ''
-
-  content += formatMilestone(milestones[0])
-  content += formatIssues(groups)
-
-  if (core.isDebug()) {
-    core.debug(`Milestones: ${JSON.stringify(milestones)}`)
-    core.debug(`Issues: ${JSON.stringify(issues)}`)
-  }
-
-  return content
-}
-
 function formatMilestone(milestone: any): string {
   let format = ''
 
   format += ` - [Milestone](${milestone.html_url})\r\n`
 
   if (milestone.description !== '') {
-    format += `<br/>${milestone.description}\r\n`
+    format += `\r\n${milestone.description}\r\n\r\n`
   }
 
   return format
@@ -79,6 +61,8 @@ function formatIssues(groups: any[]): string {
     for (const issue of group.issues) {
       format += ` - ${formatIssue(issue)}\r\n`
     }
+
+    format += '\r\n'
   }
 
   return format
@@ -92,70 +76,4 @@ function formatIssue(issue: any): string {
   }
 
   return format
-}
-
-function getIssueGroups(issues: Map<string, any[]>): any[] {
-  const groups: any[] = []
-
-  issues.forEach((value, key) => {
-    const group = {
-      name: key,
-      issues: value
-    }
-
-    group.issues.sort((a, b) => a.title.localeCompare(b.title))
-
-    groups.push(group)
-  })
-
-  groups.sort((a, b) => a.name.localeCompare(b.name))
-
-  return groups
-}
-
-function getIssueGroupsMap(issues: any[], groupLabels: any[]): Map<string, any[]> {
-  const map = new Map<string, any[]>()
-
-  for (const issue of issues) {
-    const groupName = getIssueGroupName(issue, groupLabels)
-
-    if (groupName != null) {
-      let collection = map.get(groupName)
-
-      if (collection == undefined) {
-        collection = []
-
-        map.set(groupName, collection)
-      }
-
-      collection.push(issue)
-    }
-  }
-
-  return map
-}
-
-function getIssueGroupName(issue: any, groupLabels: any[]): string | null {
-  const labels = issue.labels
-
-  for (const label of labels) {
-    const name = label.name
-    const groupName = getGroupNameByLabel(groupLabels, name)
-
-    if (groupName != null) {
-      return groupName
-    }
-  }
-
-  return null
-}
-
-function getGroupNameByLabel(groupLabels: any[], label: string): string | null {
-  for (const group of groupLabels) {
-    if (group.labels.includes(label)) {
-      return group.name
-    }
-  }
-
-  return null
 }

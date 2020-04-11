@@ -18,16 +18,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github_1 = require("@actions/github");
+const fs_1 = require("fs");
+const yaml = __importStar(require("js-yaml"));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
             const milestone = core.getInput('milestone');
-            const config = core.getInput('config');
+            const configPath = core.getInput('config');
             const github = new github_1.GitHub(token);
-            const groups = JSON.parse(config);
-            const content = yield createChangelogContent(github, milestone, groups);
+            const file = yield fs_1.promises.readFile(configPath);
+            const config = yaml.load(file.toString());
+            const content = yield createChangelogContent(github, milestone, config);
             core.setOutput('content', content);
         }
         catch (error) {

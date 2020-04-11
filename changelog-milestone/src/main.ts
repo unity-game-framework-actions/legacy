@@ -1,5 +1,7 @@
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
+import {promises as fs} from 'fs'
+import * as yaml from 'js-yaml'
 
 run()
 
@@ -7,12 +9,13 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const milestone = core.getInput('milestone')
-    const config = core.getInput('config')
+    const configPath = core.getInput('config')
 
     const github = new GitHub(token)
-    const groups = JSON.parse(config)
+    const file = await fs.readFile(configPath)
+    const config = yaml.load(file.toString())
 
-    const content = await createChangelogContent(github, milestone, groups)
+    const content = await createChangelogContent(github, milestone, config)
 
     core.setOutput('content', content)
   } catch (error) {

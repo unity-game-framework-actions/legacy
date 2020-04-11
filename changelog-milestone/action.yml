@@ -6,6 +6,8 @@ inputs:
   milestone:
     required: true
   config:
+    default: .github/changelog.yml
+  config2:
     default: |
       [
         {  

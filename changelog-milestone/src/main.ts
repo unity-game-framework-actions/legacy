@@ -7,29 +7,10 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const milestone = core.getInput('milestone')
+    const groupsConfig = core.getInput('groups-config')
 
     const github = new GitHub(token)
-
-    const groupLabels = [
-      {
-        name: 'Added',
-        labels: [
-          'Add'
-        ]
-      },
-      {
-        name: 'Removed',
-        labels: [
-          'Removed'
-        ]
-      },
-      {
-        name: 'Deprecated',
-        labels: [
-          'Deprecate'
-        ]
-      }
-    ]
+    const groupLabels = JSON.parse(groupsConfig)
 
     const content = await createChangelogContent(github, milestone, groupLabels)
 
@@ -63,7 +44,13 @@ function formatIssues(groups: any[]): string {
 }
 
 function formatIssue(issue: any): string {
-  return `${issue.title} ([#${issue.number}](${issue.html_url}))`
+  let format = `${issue.title} ([#${issue.number}](${issue.html_url}))`
+
+  if (issue.body !== '') {
+    format += `<br/>${issue.body}`
+  }
+
+  return format
 }
 
 function getIssueGroups(issues: Map<string, any[]>): any[] {
@@ -108,7 +95,7 @@ function getIssueGroupsMap(issues: any[], groupLabels: any[]): Map<string, any[]
 }
 
 function getIssueGroupName(issue: any, groupLabels: any[]): string | null {
-  const labels = issue.labels;
+  const labels = issue.labels
 
   for (const label of labels) {
     const name = label.name

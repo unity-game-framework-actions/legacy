@@ -5,6 +5,46 @@ inputs:
     default: ${{ github.token }}
   milestone:
     required: true
+  groups-config: 
+    default: |
+      [
+        {
+          "name": "Added",
+          "labels": [
+            "Feature"
+          ]
+        },
+        {
+          "name": "Changed",
+          "labels": [
+            "Change"
+          ]
+        },
+        {
+          "name": "Deprecated",
+          "labels": [
+            "Deprecation"
+          ]
+        },
+        {
+          "name": "Removed",
+          "labels": [
+            "Remove"
+          ]
+        },
+        {
+          "name": "Fixed",
+          "labels": [
+            "Bug"
+          ]
+        },
+        {
+          "name": "Security",
+          "labels": [
+            "Security"
+          ]
+        }
+      ]
 output:
   content:
     description: ''

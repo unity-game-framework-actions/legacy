@@ -7,17 +7,37 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const milestone = core.getInput('milestone')
-    const groupsConfig = core.getInput('groups-config')
+    const groupsConfig = core.getInput('groups-config2')
 
     const github = new GitHub(token)
-    const groupLabels = JSON.parse(groupsConfig)
+    const config = JSON.parse(groupsConfig)
 
-    const content = await createChangelogContent(github, milestone, groupLabels)
+    const content = await createChangelogContent2(github, milestone, config)
 
     core.setOutput('content', content)
   } catch (error) {
     core.setFailed(error.message)
   }
+}
+
+async function createChangelogContent2(github: GitHub, milestone: string, groupConfig: any[]): Promise<string> {
+  let content = ''
+  const milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestone}`)
+  const groups = []
+
+  for (const group of groupConfig) {
+    const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone}&state=all&labels=${group.labels}`)
+
+    groups.push({
+      name: group.name,
+      issues: issues
+    })
+  }
+
+  content += formatMilestone(milestones[0])
+  content += formatIssues(groups)
+
+  return content
 }
 
 async function createChangelogContent(github: GitHub, milestone: string, groupLabels: any[]): Promise<string> {
@@ -83,12 +103,12 @@ function getIssueGroups(issues: Map<string, any[]>): any[] {
       issues: value
     }
 
-    group.issues.sort((a, b) => b.title.localeCompare(a.title))
+    group.issues.sort((a, b) => a.title.localeCompare(b.title))
 
     groups.push(group)
   })
 
-  groups.sort((a, b) => b.name.localeCompare(a.name))
+  groups.sort((a, b) => a.name.localeCompare(b.name))
 
   return groups
 }

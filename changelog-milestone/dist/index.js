@@ -3524,15 +3524,32 @@ function run() {
         try {
             const token = core.getInput('token');
             const milestone = core.getInput('milestone');
-            const groupsConfig = core.getInput('groups-config');
+            const groupsConfig = core.getInput('groups-config2');
             const github = new github_1.GitHub(token);
-            const groupLabels = JSON.parse(groupsConfig);
-            const content = yield createChangelogContent(github, milestone, groupLabels);
+            const config = JSON.parse(groupsConfig);
+            const content = yield createChangelogContent2(github, milestone, config);
             core.setOutput('content', content);
         }
         catch (error) {
             core.setFailed(error.message);
         }
+    });
+}
+function createChangelogContent2(github, milestone, groupConfig) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let content = '';
+        const milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestone}`);
+        const groups = [];
+        for (const group of groupConfig) {
+            const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=all&labels=${group.labels}`);
+            groups.push({
+                name: group.name,
+                issues: issues
+            });
+        }
+        content += formatMilestone(milestones[0]);
+        content += formatIssues(groups);
+        return content;
     });
 }
 function createChangelogContent(github, milestone, groupLabels) {
@@ -3583,10 +3600,10 @@ function getIssueGroups(issues) {
             name: key,
             issues: value
         };
-        group.issues.sort((a, b) => b.title.localeCompare(a.title));
+        group.issues.sort((a, b) => a.title.localeCompare(b.title));
         groups.push(group);
     });
-    groups.sort((a, b) => b.name.localeCompare(a.name));
+    groups.sort((a, b) => a.name.localeCompare(b.name));
     return groups;
 }
 function getIssueGroupsMap(issues, groupLabels) {

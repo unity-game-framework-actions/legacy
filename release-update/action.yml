@@ -1,0 +1,22 @@
+name: 'UGF.Draft.TypeScript'
+description: 'No description.'
+inputs:
+  token:
+    default: ${{ github.token }}
+  id:
+    required: true
+  tag:
+    required: false
+  commitish:
+    required: false
+  name:
+    required: false
+  body:
+    required: false
+  draft:
+    required: false
+  prerelease:
+    required: false
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -66,7 +66,7 @@ async function getMilestone(github: GitHub, milestoneNumberOrTitle: string): Pro
 function formatMilestone(milestone: any): string {
   let format = ''
 
-  format += ` - [Milestone](${milestone.html_url})\r\n`
+  format += ` - [Milestone](${milestone.html_url}?closed=1)\r\n`
 
   if (milestone.description !== '') {
     format += `\r\n${milestone.description}\r\n\r\n`

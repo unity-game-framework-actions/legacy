@@ -31,37 +31,40 @@ function run() {
             const draft = core.getInput('draft');
             const prerelease = core.getInput('prerelease');
             const github = new github_1.GitHub(token);
-            const change = {
-                tag: tag,
-                commitish: commitish,
-                name: name,
-                body: body,
-                draft: draft,
-                prerelease: prerelease
-            };
             const release = yield getRelease(github, id);
-            const changed = changeRelease(release, change);
-            yield updateRelease(github, changed);
+            if (release != null) {
+                const change = {
+                    tag: tag,
+                    commitish: commitish,
+                    name: name,
+                    body: body,
+                    draft: draft,
+                    prerelease: prerelease
+                };
+                const changed = changeRelease(release, change);
+                yield updateRelease(github, changed);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
 }
-function getRelease(github, idOrName) {
+function getRelease(github, idOrTag) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases/${idOrName}`);
+            const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases/${idOrTag}`);
             return releases[0];
         }
         catch (error) {
             const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
             for (const release of releases) {
-                if (release.name === idOrName) {
+                if (release.tag_name === idOrTag) {
                     return release;
                 }
             }
-            throw `Release by the specified id or name not found: '${idOrName}'.`;
+            core.warning(`Release by the specified id or tag name not found: '${idOrTag}'.`);
+            return null;
         }
     });
 }

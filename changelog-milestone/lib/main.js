@@ -46,18 +46,20 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
     return __awaiter(this, void 0, void 0, function* () {
         let content = '';
         const milestone = yield getMilestone(github, milestoneNumberOrTitle);
-        const groups = [];
-        for (const group of config) {
-            const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`);
-            if (issues.length > 0) {
-                groups.push({
-                    name: group.name,
-                    issues: issues
-                });
+        if (milestone != null) {
+            const groups = [];
+            for (const group of config) {
+                const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`);
+                if (issues.length > 0) {
+                    groups.push({
+                        name: group.name,
+                        issues: issues
+                    });
+                }
             }
+            content += formatMilestone(milestone);
+            content += formatIssues(groups);
         }
-        content += formatMilestone(milestone);
-        content += formatIssues(groups);
         return content;
     });
 }
@@ -74,7 +76,8 @@ function getMilestone(github, milestoneNumberOrTitle) {
                     return milestone;
                 }
             }
-            throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`;
+            core.warning(`Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`);
+            return null;
         }
     });
 }

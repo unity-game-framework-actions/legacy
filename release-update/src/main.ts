@@ -15,39 +15,44 @@ async function run(): Promise<void> {
     const prerelease = core.getInput('prerelease')
 
     const github = new GitHub(token)
-    const change = {
-      tag: tag,
-      commitish: commitish,
-      name: name,
-      body: body,
-      draft: draft,
-      prerelease: prerelease
-    }
-
     const release = await getRelease(github, id)
-    const changed = changeRelease(release, change)
 
-    await updateRelease(github, changed)
+    if (release != null) {
+      const change = {
+        tag: tag,
+        commitish: commitish,
+        name: name,
+        body: body,
+        draft: draft,
+        prerelease: prerelease
+      }
+
+      const changed = changeRelease(release, change)
+
+      await updateRelease(github, changed)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
 }
 
-async function getRelease(github: GitHub, idOrName: string): Promise<any> {
+async function getRelease(github: GitHub, idOrTag: string): Promise<any> {
   try {
-    const releases = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/releases/${idOrName}`)
+    const releases = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/releases/${idOrTag}`)
 
     return releases[0]
   } catch (error) {
     const releases = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/releases`)
 
     for (const release of releases) {
-      if (release.name === idOrName) {
+      if (release.tag_name === idOrTag) {
         return release
       }
     }
 
-    throw `Release by the specified id or name not found: '${idOrName}'.`
+    core.warning(`Release by the specified id or tag name not found: '${idOrTag}'.`)
+
+    return null
   }
 }
 

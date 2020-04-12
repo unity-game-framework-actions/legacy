@@ -4,6 +4,7 @@ inputs:
   token:
     default: ${{ github.token }}
   id:
+    description: 'Release id or tag name.'
     required: true
   tag:
     required: false

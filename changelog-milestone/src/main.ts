@@ -27,21 +27,24 @@ async function run(): Promise<void> {
 async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: string, config: any[]): Promise<string> {
   let content = ''
   const milestone = await getMilestone(github, milestoneNumberOrTitle)
-  const groups = []
 
-  for (const group of config) {
-    const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`)
+  if (milestone != null) {
+    const groups = []
 
-    if (issues.length > 0) {
-      groups.push({
-        name: group.name,
-        issues: issues
-      })
+    for (const group of config) {
+      const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`)
+
+      if (issues.length > 0) {
+        groups.push({
+          name: group.name,
+          issues: issues
+        })
+      }
     }
-  }
 
-  content += formatMilestone(milestone)
-  content += formatIssues(groups)
+    content += formatMilestone(milestone)
+    content += formatIssues(groups)
+  }
 
   return content
 }
@@ -60,7 +63,9 @@ async function getMilestone(github: GitHub, milestoneNumberOrTitle: string): Pro
       }
     }
 
-    throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`
+    core.warning(`Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`)
+
+    return null
   }
 }
 

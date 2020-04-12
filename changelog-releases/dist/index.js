@@ -3523,16 +3523,17 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
-            const commitContent = core.getInput('commit-content');
-            const commitMessage = core.getInput('commit-message');
-            const commitUserName = core.getInput('commit-user-name');
-            const commitUserEmail = core.getInput('commit-user-email');
-            const contentName = core.getInput('content-name');
-            const contentHeader = core.getInput('content-header');
+            const commit = core.getInput('commit') === 'true';
+            const message = core.getInput('message');
+            const user = core.getInput('user');
+            const email = core.getInput('email');
+            const file = core.getInput('file');
+            const header = core.getInput('header');
+            const noChangelog = core.getInput('no-changelog');
             const github = new github_1.GitHub(token);
-            const content = yield createChangelogContent(github, contentHeader);
-            if (commitContent) {
-                yield updateChangelogContent(github, content, contentName, commitMessage, commitUserName, commitUserEmail);
+            const content = yield createChangelogContent(github, header, noChangelog);
+            if (commit) {
+                yield updateChangelogContent(github, content, file, message, user, email);
             }
             core.setOutput('content', content);
         }
@@ -3541,51 +3542,48 @@ function run() {
         }
     });
 }
-function createChangelogContent(github, header) {
+function createChangelogContent(github, header, noChangelog) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
         releases.sort((a, b) => b.name.localeCompare(a.name));
-        const content = formatReleaseAll(releases, header);
-        if (core.isDebug()) {
-            core.debug(JSON.stringify(releases));
-        }
+        const content = formatReleaseAll(releases, header, noChangelog);
         return content;
     });
 }
-function updateChangelogContent(github, content, contentName, message, userName, userEmail) {
+function updateChangelogContent(github, content, file, message, user, email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${contentName}`);
+        const response = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}`);
         const base64 = Buffer.from(content).toString('base64');
         const sha = response.data.sha;
         yield github.repos.createOrUpdateFile({
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo,
-            path: contentName,
+            path: file,
             message: message,
             content: base64,
             sha: sha,
             committer: {
-                name: userName,
-                email: userEmail
+                name: user,
+                email: email
             },
             author: {
-                name: userName,
-                email: userEmail
+                name: user,
+                email: email
             }
         });
     });
 }
-function formatReleaseAll(releases, header) {
+function formatReleaseAll(releases, header, noChangelog) {
     let format = `${header}\r\n\r\n`;
     for (const release of releases) {
-        format += formatRelease(release);
+        format += formatRelease(release, noChangelog);
     }
     return format;
 }
-function formatRelease(release) {
+function formatRelease(release, noChangelog) {
     const name = release.name !== '' ? release.name : release.tag_name;
     const date = formatDate(release.published_at);
-    const body = release.body;
+    const body = release.body !== '' ? release.body : noChangelog;
     return `## ${name} - ${date}\r\n${body}\r\n\r\n`;
 }
 function formatDate(date) {

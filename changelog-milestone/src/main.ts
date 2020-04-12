@@ -46,10 +46,12 @@ async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: st
 }
 
 async function getMilestone(github: GitHub, milestoneNumberOrTitle: string): Promise<any> {
-  let milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestoneNumberOrTitle}`)
+  try {
+    const milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones/${milestoneNumberOrTitle}`)
 
-  if (milestones.length == 0) {
-    milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones?state=all`)
+    return milestones[0]
+  } catch (error) {
+    const milestones = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/milestones?state=all`)
 
     for (const milestone of milestones) {
       if (milestone.title === milestoneNumberOrTitle) {
@@ -59,8 +61,6 @@ async function getMilestone(github: GitHub, milestoneNumberOrTitle: string): Pro
 
     throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`
   }
-
-  return milestones[0]
 }
 
 function formatMilestone(milestone: any): string {

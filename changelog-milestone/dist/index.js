@@ -4158,9 +4158,12 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
 }
 function getMilestone(github, milestoneNumberOrTitle) {
     return __awaiter(this, void 0, void 0, function* () {
-        let milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestoneNumberOrTitle}`);
-        if (milestones.length == 0) {
-            milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones?state=all`);
+        try {
+            const milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestoneNumberOrTitle}`);
+            return milestones[0];
+        }
+        catch (error) {
+            const milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones?state=all`);
             for (const milestone of milestones) {
                 if (milestone.title === milestoneNumberOrTitle) {
                     return milestone;
@@ -4168,7 +4171,6 @@ function getMilestone(github, milestoneNumberOrTitle) {
             }
             throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`;
         }
-        return milestones[0];
     });
 }
 function formatMilestone(milestone) {

@@ -4114,11 +4114,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 const fs_1 = __webpack_require__(747);
 const yaml = __importStar(__webpack_require__(414));
+const indent_string_1 = __importDefault(__webpack_require__(257));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -4175,9 +4179,9 @@ function getMilestone(github, milestoneNumberOrTitle) {
 }
 function formatMilestone(milestone) {
     let format = '';
-    format += ` - [Milestone](${milestone.html_url})\r\n`;
+    format += ` - [Milestone](${milestone.html_url}?closed=1)\r\n\r\n`;
     if (milestone.description !== '') {
-        format += `\r\n${milestone.description}\r\n\r\n`;
+        format += `${milestone.description}\r\n\r\n`;
     }
     return format;
 }
@@ -4195,7 +4199,8 @@ function formatIssues(groups) {
 function formatIssue(issue) {
     let format = `${issue.title} ([#${issue.number}](${issue.html_url}))`;
     if (issue.body !== '') {
-        format += `<br/>${issue.body}`;
+        const body = indent_string_1.default(issue.body, 4);
+        format += `\r\n${body}`;
     }
     return format;
 }
@@ -4279,6 +4284,49 @@ module.exports = new Type('tag:yaml.org,2002:bool', {
   },
   defaultStyle: 'lowercase'
 });
+
+
+/***/ }),
+
+/***/ 257:
+/***/ (function(module) {
+
+"use strict";
+
+
+module.exports = (string, count = 1, options) => {
+	options = {
+		indent: ' ',
+		includeEmptyLines: false,
+		...options
+	};
+
+	if (typeof string !== 'string') {
+		throw new TypeError(
+			`Expected \`input\` to be a \`string\`, got \`${typeof string}\``
+		);
+	}
+
+	if (typeof count !== 'number') {
+		throw new TypeError(
+			`Expected \`count\` to be a \`number\`, got \`${typeof count}\``
+		);
+	}
+
+	if (typeof options.indent !== 'string') {
+		throw new TypeError(
+			`Expected \`options.indent\` to be a \`string\`, got \`${typeof options.indent}\``
+		);
+	}
+
+	if (count === 0) {
+		return string;
+	}
+
+	const regex = options.includeEmptyLines ? /^/gm : /^(?!\s*$)/gm;
+
+	return string.replace(regex, options.indent.repeat(count));
+};
 
 
 /***/ }),

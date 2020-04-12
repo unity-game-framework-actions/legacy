@@ -15,11 +15,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github_1 = require("@actions/github");
 const fs_1 = require("fs");
 const yaml = __importStar(require("js-yaml"));
+const indent_string_1 = __importDefault(require("indent-string"));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -76,9 +80,9 @@ function getMilestone(github, milestoneNumberOrTitle) {
 }
 function formatMilestone(milestone) {
     let format = '';
-    format += ` - [Milestone](${milestone.html_url})\r\n`;
+    format += ` - [Milestone](${milestone.html_url}?closed=1)\r\n\r\n`;
     if (milestone.description !== '') {
-        format += `\r\n${milestone.description}\r\n\r\n`;
+        format += `${milestone.description}\r\n\r\n`;
     }
     return format;
 }
@@ -96,7 +100,8 @@ function formatIssues(groups) {
 function formatIssue(issue) {
     let format = `${issue.title} ([#${issue.number}](${issue.html_url}))`;
     if (issue.body !== '') {
-        format += `<br/>${issue.body}`;
+        const body = indent_string_1.default(issue.body, 4);
+        format += `\r\n${body}`;
     }
     return format;
 }

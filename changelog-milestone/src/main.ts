@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 import {promises as fs} from 'fs'
 import * as yaml from 'js-yaml'
+import indentString from 'indent-string'
 
 run()
 
@@ -66,10 +67,10 @@ async function getMilestone(github: GitHub, milestoneNumberOrTitle: string): Pro
 function formatMilestone(milestone: any): string {
   let format = ''
 
-  format += ` - [Milestone](${milestone.html_url}?closed=1)\r\n`
+  format += ` - [Milestone](${milestone.html_url}?closed=1)\r\n\r\n`
 
   if (milestone.description !== '') {
-    format += `\r\n${milestone.description}\r\n\r\n`
+    format += `${milestone.description}\r\n\r\n`
   }
 
   return format
@@ -95,7 +96,9 @@ function formatIssue(issue: any): string {
   let format = `${issue.title} ([#${issue.number}](${issue.html_url}))`
 
   if (issue.body !== '') {
-    format += `<br/>${issue.body}`
+    const body = indentString(issue.body, 4)
+
+    format += `\r\n${body}`
   }
 
   return format

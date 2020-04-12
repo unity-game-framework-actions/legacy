@@ -4137,13 +4137,13 @@ function run() {
         }
     });
 }
-function createChangelogContent(github, milestone, config) {
+function createChangelogContent(github, milestoneNumberOrTitle, config) {
     return __awaiter(this, void 0, void 0, function* () {
         let content = '';
-        const milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestone}`);
+        const milestone = yield getMilestone(github, milestoneNumberOrTitle);
         const groups = [];
         for (const group of config) {
-            const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone}&state=all&labels=${group.labels}`);
+            const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`);
             if (issues.length > 0) {
                 groups.push({
                     name: group.name,
@@ -4151,9 +4151,24 @@ function createChangelogContent(github, milestone, config) {
                 });
             }
         }
-        content += formatMilestone(milestones[0]);
+        content += formatMilestone(milestone);
         content += formatIssues(groups);
         return content;
+    });
+}
+function getMilestone(github, milestoneNumberOrTitle) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones/${milestoneNumberOrTitle}`);
+        if (milestones.length == 0) {
+            milestones = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/milestones?state=all`);
+            for (const milestone of milestones) {
+                if (milestone.title === milestoneNumberOrTitle) {
+                    return milestone;
+                }
+            }
+            throw `Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`;
+        }
+        return milestones[0];
     });
 }
 function formatMilestone(milestone) {

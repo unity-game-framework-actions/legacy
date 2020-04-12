@@ -4,6 +4,7 @@ inputs:
   token:
     default: ${{ github.token }}
   milestone:
+    description: 'Milestone number or title.'
     required: true
   config:
     default: .github/changelog.yml

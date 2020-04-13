@@ -1,0 +1,14 @@
+name: 'UGF.Repository.Dispatch'
+description: 'No description.'
+inputs:
+  token:
+    default: ${{ github.token }}
+  repository:
+    default: ${{ github.repository }}
+  eventType:
+    required: true
+  payload:
+    default: '{}'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

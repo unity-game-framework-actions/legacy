@@ -14,12 +14,16 @@ async function run(): Promise<void> {
     const github = new GitHub(token)
     const repo = getOwnerAndRepo(repository)
     const clientPayload = getPayload(payload)
+    const json = JSON.stringify(clientPayload)
+
+    core.debug(`clientPayload: '${clientPayload}'`)
+    core.debug(`json: '${json}'`)
 
     await github.repos.createDispatchEvent({
       owner: repo.owner,
       repo: repo.repo,
       event_type: eventType,
-      client_payload: JSON.stringify(clientPayload)
+      client_payload: json
     })
   } catch (error) {
     core.setFailed(error.message)

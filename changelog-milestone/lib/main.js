@@ -46,9 +46,18 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
     return __awaiter(this, void 0, void 0, function* () {
         let content = '';
         const milestone = yield getMilestone(github, milestoneNumberOrTitle);
+        if (config.releaseNotes.header !== '') {
+            content += `${config.releaseNotes.header}\r\n`;
+        }
         if (milestone != null) {
             const groups = [];
-            for (const group of config.groups) {
+            if (config.releaseNotes.title !== '') {
+                content += `${config.releaseNotes.title}\r\n`;
+            }
+            if (config.releaseNotes.description !== '') {
+                content += `${config.releaseNotes.description}\r\n`;
+            }
+            for (const group of config.releaseNotes.groups) {
                 const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`);
                 if (issues.length > 0) {
                     groups.push({

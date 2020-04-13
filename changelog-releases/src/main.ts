@@ -64,7 +64,7 @@ async function updateChangelogContent(github: GitHub, content: string, file: str
 }
 
 function formatReleaseAll(releases: any[], config: any): string {
-  let format = `${config.title}\r\n\r\n${config.description}\r\n\r\n`
+  let format = `${config.changelog.title}\r\n\r\n${config.changelog.description}\r\n\r\n`
 
   for (const release of releases) {
     format += formatRelease(release, config)
@@ -76,9 +76,9 @@ function formatReleaseAll(releases: any[], config: any): string {
 function formatRelease(release: any, config: any): string {
   const name = release.name !== '' ? release.name : release.tag_name
   const date = formatDate(release.published_at)
-  const body = release.body !== '' ? release.body : config.descriptionEmptyRelease
+  const body = release.body !== '' ? release.body : config.changelog.descriptionEmptyRelease
 
-  return `## ${name} - ${date}\r\n${body}\r\n\r\n`
+  return `## [${name}](${release.html_url}) - ${date}\r\n${body}\r\n\r\n`
 }
 
 function formatDate(date: string): string {

@@ -77,7 +77,7 @@ function updateChangelogContent(github, content, file, message, user, email) {
     });
 }
 function formatReleaseAll(releases, config) {
-    let format = `${config.title}\r\n\r\n${config.description}\r\n\r\n`;
+    let format = `${config.changelog.title}\r\n\r\n${config.changelog.description}\r\n\r\n`;
     for (const release of releases) {
         format += formatRelease(release, config);
     }
@@ -86,8 +86,8 @@ function formatReleaseAll(releases, config) {
 function formatRelease(release, config) {
     const name = release.name !== '' ? release.name : release.tag_name;
     const date = formatDate(release.published_at);
-    const body = release.body !== '' ? release.body : config.descriptionEmptyRelease;
-    return `## ${name} - ${date}\r\n${body}\r\n\r\n`;
+    const body = release.body !== '' ? release.body : config.changelog.descriptionEmptyRelease;
+    return `## [${name}](${release.html_url}) - ${date}\r\n${body}\r\n\r\n`;
 }
 function formatDate(date) {
     const index = date.indexOf('T');

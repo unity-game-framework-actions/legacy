@@ -28,10 +28,22 @@ async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: st
   let content = ''
   const milestone = await getMilestone(github, milestoneNumberOrTitle)
 
+  if (config.releaseNotes.header !== '') {
+    content += `${config.releaseNotes.header}\r\n`
+  }
+
   if (milestone != null) {
     const groups = []
 
-    for (const group of config.groups) {
+    if (config.releaseNotes.title !== '') {
+      content += `${config.releaseNotes.title}\r\n`
+    }
+
+    if (config.releaseNotes.description !== '') {
+      content += `${config.releaseNotes.description}\r\n`
+    }
+
+    for (const group of config.releaseNotes.groups) {
       const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`)
 
       if (issues.length > 0) {

@@ -4133,7 +4133,7 @@ function run() {
                 owner: repo.owner,
                 repo: repo.repo,
                 event_type: eventType,
-                client_payload: clientPayload
+                client_payload: JSON.stringify(clientPayload)
             });
         }
         catch (error) {

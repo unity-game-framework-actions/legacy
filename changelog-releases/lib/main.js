@@ -18,6 +18,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github_1 = require("@actions/github");
+const fs_1 = require("fs");
+const yaml = __importStar(require("js-yaml"));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -28,10 +30,11 @@ function run() {
             const user = core.getInput('user');
             const email = core.getInput('email');
             const file = core.getInput('file');
-            const header = core.getInput('header');
-            const noChangelog = core.getInput('no-changelog');
+            const configPath = core.getInput('config');
             const github = new github_1.GitHub(token);
-            const content = yield createChangelogContent(github, header, noChangelog);
+            const configFile = yield fs_1.promises.readFile(configPath);
+            const config = yaml.load(configFile.toString());
+            const content = yield createChangelogContent(github, config);
             if (commit) {
                 yield updateChangelogContent(github, content, file, message, user, email);
             }
@@ -42,11 +45,11 @@ function run() {
         }
     });
 }
-function createChangelogContent(github, header, noChangelog) {
+function createChangelogContent(github, config) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
         releases.sort((a, b) => b.name.localeCompare(a.name));
-        const content = formatReleaseAll(releases, header, noChangelog);
+        const content = formatReleaseAll(releases, config);
         return content;
     });
 }
@@ -73,17 +76,17 @@ function updateChangelogContent(github, content, file, message, user, email) {
         });
     });
 }
-function formatReleaseAll(releases, header, noChangelog) {
-    let format = `${header}\r\n\r\n`;
+function formatReleaseAll(releases, config) {
+    let format = `${config.title}\r\n\r\n${config.description}\r\n\r\n`;
     for (const release of releases) {
-        format += formatRelease(release, noChangelog);
+        format += formatRelease(release, config);
     }
     return format;
 }
-function formatRelease(release, noChangelog) {
+function formatRelease(release, config) {
     const name = release.name !== '' ? release.name : release.tag_name;
     const date = formatDate(release.published_at);
-    const body = release.body !== '' ? release.body : noChangelog;
+    const body = release.body !== '' ? release.body : config.descriptionEmptyRelease;
     return `## ${name} - ${date}\r\n${body}\r\n\r\n`;
 }
 function formatDate(date) {

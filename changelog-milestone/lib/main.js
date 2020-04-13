@@ -32,8 +32,8 @@ function run() {
             const milestone = core.getInput('milestone');
             const configPath = core.getInput('config');
             const github = new github_1.GitHub(token);
-            const file = yield fs_1.promises.readFile(configPath);
-            const config = yaml.load(file.toString());
+            const configFile = yield fs_1.promises.readFile(configPath);
+            const config = yaml.load(configFile.toString());
             const content = yield createChangelogContent(github, milestone, config);
             core.setOutput('content', content);
         }
@@ -48,7 +48,7 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
         const milestone = yield getMilestone(github, milestoneNumberOrTitle);
         if (milestone != null) {
             const groups = [];
-            for (const group of config) {
+            for (const group of config.groups) {
                 const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`);
                 if (issues.length > 0) {
                     groups.push({

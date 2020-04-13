@@ -1,5 +1,7 @@
 import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
+import {promises as fs} from 'fs'
+import * as yaml from 'js-yaml'
 
 run()
 
@@ -11,11 +13,12 @@ async function run(): Promise<void> {
     const user = core.getInput('user')
     const email = core.getInput('email')
     const file = core.getInput('file')
-    const header = core.getInput('header')
-    const noChangelog = core.getInput('no-changelog')
+    const configPath = core.getInput('config')
 
     const github = new GitHub(token)
-    const content = await createChangelogContent(github, header, noChangelog)
+    const configFile = await fs.readFile(configPath)
+    const config = yaml.load(configFile.toString())
+    const content = await createChangelogContent(github, config)
 
     if (commit) {
       await updateChangelogContent(github, content, file, message, user, email)
@@ -27,12 +30,12 @@ async function run(): Promise<void> {
   }
 }
 
-async function createChangelogContent(github: GitHub, header: string, noChangelog: string): Promise<string> {
+async function createChangelogContent(github: GitHub, config: any): Promise<string> {
   const releases = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/releases`)
 
   releases.sort((a, b) => b.name.localeCompare(a.name))
 
-  const content = formatReleaseAll(releases, header, noChangelog)
+  const content = formatReleaseAll(releases, config)
 
   return content
 }
@@ -60,20 +63,20 @@ async function updateChangelogContent(github: GitHub, content: string, file: str
   })
 }
 
-function formatReleaseAll(releases: any[], header: string, noChangelog: string): string {
-  let format = `${header}\r\n\r\n`
+function formatReleaseAll(releases: any[], config: any): string {
+  let format = `${config.title}\r\n\r\n${config.description}\r\n\r\n`
 
   for (const release of releases) {
-    format += formatRelease(release, noChangelog)
+    format += formatRelease(release, config)
   }
 
   return format
 }
 
-function formatRelease(release: any, noChangelog: string): string {
+function formatRelease(release: any, config: any): string {
   const name = release.name !== '' ? release.name : release.tag_name
   const date = formatDate(release.published_at)
-  const body = release.body !== '' ? release.body : noChangelog
+  const body = release.body !== '' ? release.body : config.descriptionEmptyRelease
 
   return `## ${name} - ${date}\r\n${body}\r\n\r\n`
 }

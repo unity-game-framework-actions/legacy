@@ -13,8 +13,8 @@ async function run(): Promise<void> {
     const configPath = core.getInput('config')
 
     const github = new GitHub(token)
-    const file = await fs.readFile(configPath)
-    const config = yaml.load(file.toString())
+    const configFile = await fs.readFile(configPath)
+    const config = yaml.load(configFile.toString())
 
     const content = await createChangelogContent(github, milestone, config)
 
@@ -24,14 +24,14 @@ async function run(): Promise<void> {
   }
 }
 
-async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: string, config: any[]): Promise<string> {
+async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: string, config: any): Promise<string> {
   let content = ''
   const milestone = await getMilestone(github, milestoneNumberOrTitle)
 
   if (milestone != null) {
     const groups = []
 
-    for (const group of config) {
+    for (const group of config.groups) {
       const issues = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`)
 
       if (issues.length > 0) {

@@ -4130,8 +4130,6 @@ function run() {
             const repo = getOwnerAndRepo(repository);
             const clientPayload = getPayload(payload);
             const json = JSON.stringify(clientPayload);
-            core.debug(`clientPayload: '${clientPayload}'`);
-            core.debug(`json: '${json}'`);
             yield github.repos.createDispatchEvent({
                 owner: repo.owner,
                 repo: repo.repo,

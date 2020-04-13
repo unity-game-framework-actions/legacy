@@ -16,9 +16,6 @@ async function run(): Promise<void> {
     const clientPayload = getPayload(payload)
     const json = JSON.stringify(clientPayload)
 
-    core.debug(`clientPayload: '${clientPayload}'`)
-    core.debug(`json: '${json}'`)
-
     await github.repos.createDispatchEvent({
       owner: repo.owner,
       repo: repo.repo,

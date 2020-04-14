@@ -683,8 +683,8 @@ function run() {
             const params = parseParams(paramsInput, extract, extractRegex);
             const merge = Object.assign(config, params);
             const content = format(merge, output);
-            core.debug(`params: ${JSON.stringify(params)}`);
-            core.debug(`merge: ${JSON.stringify(merge)}`);
+            core.warning(`PARAMS: '${JSON.stringify(params)}'`);
+            core.warning(`MERGE: '${JSON.stringify(merge)}'`);
             core.setOutput('content', content);
         }
         catch (error) {

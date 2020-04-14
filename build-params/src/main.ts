@@ -46,16 +46,9 @@ function parseParams(params: string, extract: boolean, regex: string): any {
 }
 
 function extractFromInput(input: string, regex: string): string {
-  const matches = input.match(regex)
-
-  core.warning(`input '${input}'`)
-  core.warning(`regex '${regex}'`)
-  core.warning(`matches is null '${matches == null}'`)
-  core.warning(`matches '${matches}'`)
+  const matches = input.match(new RegExp(regex, 'g'))
 
   if (matches != null && matches.length > 0) {
-    core.warning(`length '${matches.length}'`)
-
     for (const match of matches) {
       if (match !== '') {
         return match

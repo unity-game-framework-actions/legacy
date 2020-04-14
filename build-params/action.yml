@@ -1,0 +1,19 @@
+name: 'UGF.Build.Parameters'
+description: 'No description.'
+inputs:
+  config:
+    default: .github/build.yml
+  params:
+    required: true
+  extract:
+    default: true
+  extractRegex:
+    default: '(?<=Parameters(.|\n)```yaml\n)(.|\n)*?(?=```)'
+  output:
+    default: yaml
+outputs:
+  content:
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

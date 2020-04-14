@@ -29,7 +29,7 @@ async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: st
   const milestone = await getMilestone(github, milestoneNumberOrTitle)
 
   if (config.releaseNotes.header !== '') {
-    content += `${config.releaseNotes.header}\r\n`
+    content += `${config.releaseNotes.header}\r\n\r\n`
   }
 
   if (milestone != null) {
@@ -40,7 +40,7 @@ async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: st
     }
 
     if (config.releaseNotes.description !== '') {
-      content += `${config.releaseNotes.description}\r\n`
+      content += `\r\n${config.releaseNotes.description}\r\n`
     }
 
     for (const group of config.releaseNotes.groups) {
@@ -55,7 +55,12 @@ async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: st
     }
 
     content += formatMilestone(milestone)
-    content += formatIssues(groups)
+
+    if (groups.length > 0) {
+      content += formatIssues(groups)
+    } else {
+      content += `\r\n${config.releaseNotes.descriptionEmptyRelease}\r\n`
+    }
   }
 
   return content

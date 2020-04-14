@@ -56,8 +56,10 @@ function format(params, type) {
 function parseParams(params, extract, regex) {
     const text = extract ? extractFromInput(params, regex) : params;
     if (text === '') {
+        core.warning(`PARSE PARAMS return empty`);
         return {};
     }
+    core.warning(`TEXT ${text}`);
     return yaml.load(text);
 }
 function extractFromInput(input, regex) {

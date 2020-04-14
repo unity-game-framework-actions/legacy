@@ -43,8 +43,12 @@ function parseParams(params: string, extract: boolean, regex: string): any {
   const text = extract ? extractFromInput(params, regex) : params
 
   if (text === '') {
+    core.warning(`PARSE PARAMS return empty`)
+
     return {}
   }
+
+  core.warning(`TEXT ${text}`)
 
   return yaml.load(text)
 }

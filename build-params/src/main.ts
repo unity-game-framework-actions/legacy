@@ -18,6 +18,7 @@ async function run(): Promise<void> {
     const merge = Object.assign(config, params)
     const content = format(merge, output)
 
+    core.warning(`INPUT '${paramsInput}'`)
     core.warning(`PARAMS: '${JSON.stringify(params)}'`)
     core.warning(`MERGE: '${JSON.stringify(merge)}'`)
 

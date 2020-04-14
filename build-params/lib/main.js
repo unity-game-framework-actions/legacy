@@ -33,9 +33,6 @@ function run() {
             const params = parseParams(paramsInput, extract, extractRegex);
             const merge = Object.assign(config, params);
             const content = format(merge, output);
-            core.warning(`INPUT '${paramsInput}'`);
-            core.warning(`PARAMS: '${JSON.stringify(params)}'`);
-            core.warning(`MERGE: '${JSON.stringify(merge)}'`);
             core.setOutput('content', content);
         }
         catch (error) {
@@ -56,16 +53,23 @@ function format(params, type) {
 function parseParams(params, extract, regex) {
     const text = extract ? extractFromInput(params, regex) : params;
     if (text === '') {
-        core.warning(`PARSE PARAMS return empty`);
         return {};
     }
-    core.warning(`TEXT ${text}`);
     return yaml.load(text);
 }
 function extractFromInput(input, regex) {
     const matches = input.match(regex);
+    core.warning(`input '${input}'`);
+    core.warning(`regex '${regex}'`);
+    core.warning(`matches is null '${matches == null}'`);
+    core.warning(`matches '${matches}'`);
     if (matches != null && matches.length > 0) {
-        return matches[0];
+        core.warning(`length '${matches.length}'`);
+        for (const match of matches) {
+            if (match !== '') {
+                return match;
+            }
+        }
     }
     return '';
 }

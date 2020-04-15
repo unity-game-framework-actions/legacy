@@ -674,16 +674,24 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const configPath = core.getInput('config');
-            const paramsInput = core.getInput('params');
+            const paramsInput = core.getInput('params', { required: true });
             const extract = core.getInput('extract') === 'true';
             const extractRegex = core.getInput('extractRegex');
             const type = core.getInput('type');
             const configFile = yield fs_1.promises.readFile(configPath);
-            const config = yaml.load(configFile.toString());
-            const paramsText = getParams(paramsInput, extract, extractRegex);
+            const config = parse(configFile.toString(), type);
+            const paramsText = extractParamsText(paramsInput, extract, extractRegex);
             const params = parse(paramsText, type);
-            const merge = Object.assign(config, params);
-            const content = format(merge, type);
+            const merged = Object.assign(config, params);
+            const content = format(merged, type);
+            core.info('Config');
+            core.info(JSON.stringify(config, null, 2));
+            core.info('Parameters');
+            core.info(JSON.stringify(params, null, 2));
+            core.info('Merged');
+            core.info(JSON.stringify(merged, null, 2));
+            core.info('Content Output');
+            core.info(content);
             core.setOutput('content', content);
         }
         catch (error) {
@@ -691,32 +699,31 @@ function run() {
         }
     });
 }
-function format(params, type) {
+function format(input, type) {
     switch (type) {
         case 'json':
-            return JSON.stringify(params);
+            return JSON.stringify(input);
         case 'yaml':
-            return yaml.dump(params);
+            return yaml.dump(input);
         default:
-            return JSON.stringify(params);
+            throw `Invalid parse type: '${type}'.`;
     }
 }
-function parse(params, type) {
-    switch (type) {
-        case 'json':
-            return JSON.parse(params);
-        case 'yaml':
-            return yaml.load(params);
-        default:
-            return JSON.stringify(params);
-    }
-}
-function getParams(params, extract, regex) {
-    const text = extract ? extractFromInput(params, regex) : params;
-    if (text === '') {
+function parse(input, type) {
+    if (input === '') {
         return {};
     }
-    return text;
+    switch (type) {
+        case 'json':
+            return JSON.parse(input);
+        case 'yaml':
+            return yaml.load(input);
+        default:
+            throw `Invalid parse type: '${type}'.`;
+    }
+}
+function extractParamsText(input, extract, regex) {
+    return extract ? extractFromInput(input, regex) : input;
 }
 function extractFromInput(input, regex) {
     const matches = input.match(new RegExp(regex, 'g'));
@@ -727,6 +734,7 @@ function extractFromInput(input, regex) {
             }
         }
     }
+    core.warning(`No matches found in specified input with regex: '${regex}'.`);
     return '';
 }
 

@@ -7,8 +7,10 @@ inputs:
     default: ${{ github.repository }}
   eventType:
     required: true
+  type:
+    default: yaml
   payload:
-    default: '{}'
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

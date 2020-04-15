@@ -9,7 +9,7 @@ run()
 async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
-    const milestone = core.getInput('milestone')
+    const milestone = core.getInput('milestone', {required: true})
     const configPath = core.getInput('config')
 
     const github = new GitHub(token)
@@ -17,6 +17,11 @@ async function run(): Promise<void> {
     const config = yaml.load(configFile.toString())
 
     const content = await createChangelogContent(github, milestone, config)
+
+    core.info('Config')
+    core.info(JSON.stringify(config, null, 2))
+    core.info('Content Output')
+    core.info(content)
 
     core.setOutput('content', content)
   } catch (error) {

@@ -6,7 +6,7 @@ run()
 async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
-    const id = core.getInput('id')
+    const id = core.getInput('id', {required: true})
     const tag = core.getInput('tag')
     const commitish = core.getInput('commitish')
     const name = core.getInput('name')
@@ -28,6 +28,11 @@ async function run(): Promise<void> {
       }
 
       const changed = changeRelease(release, change)
+
+      core.info('Release')
+      core.info(JSON.stringify(release, null, 2))
+      core.info('Change')
+      core.info(JSON.stringify(change, null, 2))
 
       await updateRelease(github, changed)
     }
@@ -57,7 +62,7 @@ async function getRelease(github: GitHub, idOrTag: string): Promise<any> {
 }
 
 async function updateRelease(github: GitHub, release: any): Promise<void> {
-  await github.repos.updateRelease({
+  const response = await github.repos.updateRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
     release_id: release.id,
@@ -68,6 +73,9 @@ async function updateRelease(github: GitHub, release: any): Promise<void> {
     draft: release.draft,
     prerelease: release.prerelease
   })
+
+  core.info('Update Release Response')
+  core.info(JSON.stringify(response))
 }
 
 function changeRelease(release: any, change: any): any {

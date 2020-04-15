@@ -3523,7 +3523,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
-            const id = core.getInput('id');
+            const id = core.getInput('id', { required: true });
             const tag = core.getInput('tag');
             const commitish = core.getInput('commitish');
             const name = core.getInput('name');
@@ -3542,6 +3542,10 @@ function run() {
                     prerelease: prerelease
                 };
                 const changed = changeRelease(release, change);
+                core.info('Release');
+                core.info(JSON.stringify(release, null, 2));
+                core.info('Change');
+                core.info(JSON.stringify(change, null, 2));
                 yield updateRelease(github, changed);
             }
         }
@@ -3570,7 +3574,7 @@ function getRelease(github, idOrTag) {
 }
 function updateRelease(github, release) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield github.repos.updateRelease({
+        const response = yield github.repos.updateRelease({
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo,
             release_id: release.id,
@@ -3581,6 +3585,8 @@ function updateRelease(github, release) {
             draft: release.draft,
             prerelease: release.prerelease
         });
+        core.info('Update Release Response');
+        core.info(JSON.stringify(response));
     });
 }
 function changeRelease(release, change) {

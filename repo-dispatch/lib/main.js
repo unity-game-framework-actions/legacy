@@ -25,39 +25,48 @@ function run() {
         try {
             const token = core.getInput('token');
             const repository = core.getInput('repository');
-            const eventType = core.getInput('eventType');
-            const payload = core.getInput('payload');
+            const eventType = core.getInput('eventType', { required: true });
+            const type = core.getInput('type');
+            const payloadText = core.getInput('payload');
             const github = new github_1.GitHub(token);
             const repo = getOwnerAndRepo(repository);
-            const clientPayload = getPayload(payload);
-            const json = JSON.stringify(clientPayload);
-            yield github.repos.createDispatchEvent({
-                owner: repo.owner,
-                repo: repo.repo,
-                event_type: eventType,
-                client_payload: json
-            });
+            const payload = parse(payloadText, type);
+            yield dispatch(github, repo.owner, repo.repo, eventType, payload);
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
 }
-function getPayload(payload) {
-    if (payload === '') {
+function dispatch(github, owner, repo, eventType, payload) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield github.repos.createDispatchEvent({
+            owner: owner,
+            repo: repo,
+            event_type: eventType,
+            client_payload: JSON.stringify(payload)
+        });
+        core.info('Create Dispatch Event Response');
+        core.info(JSON.stringify(response, null, 2));
+    });
+}
+function parse(input, type) {
+    if (input === '') {
         return {};
     }
-    else if (payload.trimLeft().startsWith('{')) {
-        return JSON.parse(payload);
-    }
-    else {
-        return yaml.load(payload);
+    switch (type) {
+        case 'json':
+            return JSON.parse(input);
+        case 'yaml':
+            return yaml.load(input);
+        default:
+            throw `Invalid parse type: '${type}'.`;
     }
 }
 function getOwnerAndRepo(repo) {
     const split = repo.split('/');
     if (split.length < 2) {
-        throw `Invalid specified repository name: '${repo}'.`;
+        throw `Invalid repository name: '${repo}'.`;
     }
     return {
         owner: split[0],

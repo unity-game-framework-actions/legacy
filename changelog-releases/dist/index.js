@@ -4134,9 +4134,13 @@ function run() {
             const configFile = yield fs_1.promises.readFile(configPath);
             const config = yaml.load(configFile.toString());
             const content = yield createChangelogContent(github, config);
+            core.info('Config');
+            core.info(JSON.stringify(config, null, 2));
             if (commit) {
                 yield updateChangelogContent(github, content, file, message, user, email);
             }
+            core.info('Content Output');
+            core.info(content);
             core.setOutput('content', content);
         }
         catch (error) {
@@ -4154,10 +4158,12 @@ function createChangelogContent(github, config) {
 }
 function updateChangelogContent(github, content, file, message, user, email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}`);
+        const info = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}`);
         const base64 = Buffer.from(content).toString('base64');
-        const sha = response.data.sha;
-        yield github.repos.createOrUpdateFile({
+        const sha = info.data.sha;
+        core.info('Content Info');
+        core.info(JSON.stringify(info, null, 2));
+        const response = yield github.repos.createOrUpdateFile({
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo,
             path: file,
@@ -4173,6 +4179,8 @@ function updateChangelogContent(github, content, file, message, user, email) {
                 email: email
             }
         });
+        core.info('Create or Update File Response');
+        core.info(JSON.stringify(response, null, 2));
     });
 }
 function formatReleaseAll(releases, config) {

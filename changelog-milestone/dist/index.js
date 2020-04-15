@@ -4128,12 +4128,16 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
-            const milestone = core.getInput('milestone');
+            const milestone = core.getInput('milestone', { required: true });
             const configPath = core.getInput('config');
             const github = new github_1.GitHub(token);
             const configFile = yield fs_1.promises.readFile(configPath);
             const config = yaml.load(configFile.toString());
             const content = yield createChangelogContent(github, milestone, config);
+            core.info('Config');
+            core.info(JSON.stringify(config, null, 2));
+            core.info('Content Output');
+            core.info(content);
             core.setOutput('content', content);
         }
         catch (error) {

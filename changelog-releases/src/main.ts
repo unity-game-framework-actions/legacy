@@ -20,9 +20,15 @@ async function run(): Promise<void> {
     const config = yaml.load(configFile.toString())
     const content = await createChangelogContent(github, config)
 
+    core.info('Config')
+    core.info(JSON.stringify(config, null, 2))
+
     if (commit) {
       await updateChangelogContent(github, content, file, message, user, email)
     }
+
+    core.info('Content Output')
+    core.info(content)
 
     core.setOutput('content', content)
   } catch (error) {
@@ -41,11 +47,14 @@ async function createChangelogContent(github: GitHub, config: any): Promise<stri
 }
 
 async function updateChangelogContent(github: GitHub, content: string, file: string, message: string, user: string, email: string): Promise<void> {
-  const response = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${file}`)
+  const info = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${file}`)
   const base64 = Buffer.from(content).toString('base64')
-  const sha = response.data.sha
+  const sha = info.data.sha
 
-  await github.repos.createOrUpdateFile({
+  core.info('Content Info')
+  core.info(JSON.stringify(info, null, 2))
+
+  const response = await github.repos.createOrUpdateFile({
     owner: context.repo.owner,
     repo: context.repo.repo,
     path: file,
@@ -61,6 +70,9 @@ async function updateChangelogContent(github: GitHub, content: string, file: str
       email: email
     }
   })
+
+  core.info('Create or Update File Response')
+  core.info(JSON.stringify(response, null, 2))
 }
 
 function formatReleaseAll(releases: any[], config: any): string {

@@ -48,7 +48,7 @@ function run() {
 function createChangelogContent(github, config) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
-        releases.sort((a, b) => b.name.localeCompare(a.name));
+        releases.sort((a, b) => b.published_at.localeCompare(a.published_at));
         const content = formatReleaseAll(releases, config);
         return content;
     });

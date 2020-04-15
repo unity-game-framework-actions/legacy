@@ -33,7 +33,7 @@ async function run(): Promise<void> {
 async function createChangelogContent(github: GitHub, config: any): Promise<string> {
   const releases = await github.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/releases`)
 
-  releases.sort((a, b) => b.name.localeCompare(a.name))
+  releases.sort((a, b) => b.published_at.localeCompare(a.published_at))
 
   const content = formatReleaseAll(releases, config)
 

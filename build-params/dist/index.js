@@ -677,12 +677,13 @@ function run() {
             const paramsInput = core.getInput('params');
             const extract = core.getInput('extract') === 'true';
             const extractRegex = core.getInput('extractRegex');
-            const output = core.getInput('output');
+            const type = core.getInput('type');
             const configFile = yield fs_1.promises.readFile(configPath);
             const config = yaml.load(configFile.toString());
-            const params = parseParams(paramsInput, extract, extractRegex);
+            const paramsText = getParams(paramsInput, extract, extractRegex);
+            const params = parse(paramsText, type);
             const merge = Object.assign(config, params);
-            const content = format(merge, output);
+            const content = format(merge, type);
             core.setOutput('content', content);
         }
         catch (error) {
@@ -700,12 +701,22 @@ function format(params, type) {
             return JSON.stringify(params);
     }
 }
-function parseParams(params, extract, regex) {
+function parse(params, type) {
+    switch (type) {
+        case 'json':
+            return JSON.parse(params);
+        case 'yaml':
+            return yaml.load(params);
+        default:
+            return JSON.stringify(params);
+    }
+}
+function getParams(params, extract, regex) {
     const text = extract ? extractFromInput(params, regex) : params;
     if (text === '') {
         return {};
     }
-    return yaml.load(text);
+    return text;
 }
 function extractFromInput(input, regex) {
     const matches = input.match(new RegExp(regex, 'g'));

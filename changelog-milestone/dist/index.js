@@ -4152,14 +4152,14 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
         if (config.releaseNotes.header !== '') {
             content += `${config.releaseNotes.header}\r\n\r\n`;
         }
+        if (config.releaseNotes.title !== '') {
+            content += `${config.releaseNotes.title}\r\n`;
+        }
+        if (config.releaseNotes.description !== '') {
+            content += `\r\n${config.releaseNotes.description}\r\n`;
+        }
         if (milestone != null) {
             const groups = [];
-            if (config.releaseNotes.title !== '') {
-                content += `${config.releaseNotes.title}\r\n`;
-            }
-            if (config.releaseNotes.description !== '') {
-                content += `\r\n${config.releaseNotes.description}\r\n`;
-            }
             for (const group of config.releaseNotes.groups) {
                 const issues = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/issues?milestone=${milestone.number}&state=all&labels=${group.labels}`);
                 if (issues.length > 0) {
@@ -4177,6 +4177,9 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
                 content += `\r\n${config.releaseNotes.descriptionEmptyRelease}\r\n`;
             }
         }
+        else {
+            content += `\r\n${config.releaseNotes.descriptionEmptyRelease}\r\n`;
+        }
         return content;
     });
 }
@@ -4193,7 +4196,7 @@ function getMilestone(github, milestoneNumberOrTitle) {
                     return milestone;
                 }
             }
-            core.warning(`Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`);
+            core.info(`Milestone not found by the specified number or title: '${milestoneNumberOrTitle}'.`);
             return null;
         }
     });

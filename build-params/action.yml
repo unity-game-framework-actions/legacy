@@ -10,7 +10,7 @@ inputs:
   extractRegex:
     default: '(?<=Parameters(.|\n|\r)*```yaml(\n|\r))(.|\n|\r)*?(?=`)'
   params:
-    required: true
+    default: ''
 outputs:
   content:
     description: ''

@@ -674,7 +674,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const configPath = core.getInput('config');
-            const paramsInput = core.getInput('params', { required: true });
+            const paramsInput = core.getInput('params');
             const extract = core.getInput('extract') === 'true';
             const extractRegex = core.getInput('extractRegex');
             const type = core.getInput('type');

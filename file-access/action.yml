@@ -1,0 +1,21 @@
+name: 'UGF.File.Access'
+description: 'No description.'
+inputs:
+  file:
+    required: true
+  isPath:
+    default: true
+  write:
+    default: false
+  get:
+    default: ''
+  set:
+    default: ''
+  type:
+    default: yaml
+output:
+  content:
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

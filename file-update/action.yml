@@ -1,0 +1,23 @@
+name: 'UGF.File.Update'
+description: 'No description.'
+inputs:
+  token:
+    default: ${{ github.token }}
+  message:
+    required: true
+  file:
+    required: true
+  content:
+    required: true
+  contentAsPath:
+    default: false
+  user:
+    default: GitHub Action
+  email:
+    default: action@github.com
+output:
+  content:
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

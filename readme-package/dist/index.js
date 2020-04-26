@@ -4119,6 +4119,7 @@ const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 const fs_1 = __webpack_require__(747);
 const yaml = __importStar(__webpack_require__(414));
+const eol = __importStar(__webpack_require__(975));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -4153,18 +4154,18 @@ function run() {
 }
 function createReadme(info, config) {
     let format = '';
-    format += `# ${info.name}\r\n`;
-    format += `${info.displayName}\r\n`;
-    format += '\r\n';
-    format += '## Info\r\n';
-    format += ` - **Version**: \`${info.version}\`\r\n`;
-    format += ` - **Unity**: \`${info.unity}\`\r\n`;
+    format += `# ${info.name}\n`;
+    format += `${info.displayName}\n`;
+    format += '\n';
+    format += '## Info\n';
+    format += ` - **Version**: \`${info.version}\`\n`;
+    format += ` - **Unity**: \`${info.unity}\`\n`;
     if (info.api !== '') {
-        format += ` - **API Compatibility Level**: \`${info.api}\`\r\n`;
+        format += ` - **API Compatibility Level**: \`${info.api}\`\n`;
     }
-    format += '\r\n';
+    format += '\n';
     if (info.dependencies != null) {
-        format += '### Dependencies';
+        format += '### Dependencies\n';
         const keys = Object.keys(info.dependencies);
         if (keys.length > 0) {
             for (const key of keys) {
@@ -4173,28 +4174,29 @@ function createReadme(info, config) {
             }
         }
         else {
-            format += ' - N/A\r\n';
+            format += ' - N/A\n';
         }
-        format += '\r\n';
+        format += '\n';
     }
-    format += '### Description\r\n';
+    format += '### Description\n';
     if (info.description !== '') {
-        format += `${info.description}\r\n`;
+        format += `${info.description}\n`;
     }
     else {
-        format += 'No description.\r\n';
+        format += 'No description.\n';
     }
     if (config.fullDescription !== '') {
-        format += `\r\n${config.fullDescription}\r\n`;
+        format += `\n${config.fullDescription}\n`;
     }
-    format += '\r\n';
+    format += '\n';
     if (config.closing !== '') {
-        format += `${config.closing}\r\n`;
+        format += `${config.closing}\n`;
     }
     if (config.footer !== '') {
-        format += `\r\n${config.footer}`;
-        format += '\r\n';
+        format += `\n${config.footer}`;
+        format += '\n';
     }
+    format = eol.crlf(format);
     return format;
 }
 function updateContent(github, content, file, message, user, email) {
@@ -29620,6 +29622,54 @@ function onceStrict (fn) {
   f.called = false
   return f
 }
+
+
+/***/ }),
+
+/***/ 975:
+/***/ (function(module) {
+
+!function(root, name, make) {
+  if ( true && module.exports) module.exports = make()
+  else root[name] = make()
+}(this, 'eol', function() {
+
+  var api = {}
+  var isWindows = typeof process != 'undefined' && 'win32' === process.platform
+  var linebreak = isWindows ? '\r\n' : '\n'
+  var newline = /\r\n|\r|\n/g
+
+  function before(text) {
+    return linebreak + text
+  }
+
+  function after(text) {
+    return text + linebreak
+  }
+
+  function converts(to) {
+    function convert(text) {
+      return text.replace(newline, to)
+    }
+    convert.toString = function() {
+      return to
+    }
+    return convert 
+  }
+
+  function split(text) {
+    return text.split(newline)
+  }
+
+  api['lf'] = converts('\n')
+  api['cr'] = converts('\r')
+  api['crlf'] = converts('\r\n')
+  api['auto'] = converts(linebreak)
+  api['before'] = before
+  api['after'] = after
+  api['split'] = split
+  return api
+});
 
 
 /***/ }),

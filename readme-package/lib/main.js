@@ -20,6 +20,7 @@ const core = __importStar(require("@actions/core"));
 const github_1 = require("@actions/github");
 const fs_1 = require("fs");
 const yaml = __importStar(require("js-yaml"));
+const eol = __importStar(require("eol"));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -54,18 +55,18 @@ function run() {
 }
 function createReadme(info, config) {
     let format = '';
-    format += `# ${info.name}\r\n`;
-    format += `${info.displayName}\r\n`;
-    format += '\r\n';
-    format += '## Info\r\n';
-    format += ` - **Version**: \`${info.version}\`\r\n`;
-    format += ` - **Unity**: \`${info.unity}\`\r\n`;
+    format += `# ${info.name}\n`;
+    format += `${info.displayName}\n`;
+    format += '\n';
+    format += '## Info\n';
+    format += ` - **Version**: \`${info.version}\`\n`;
+    format += ` - **Unity**: \`${info.unity}\`\n`;
     if (info.api !== '') {
-        format += ` - **API Compatibility Level**: \`${info.api}\`\r\n`;
+        format += ` - **API Compatibility Level**: \`${info.api}\`\n`;
     }
-    format += '\r\n';
+    format += '\n';
     if (info.dependencies != null) {
-        format += '### Dependencies';
+        format += '### Dependencies\n';
         const keys = Object.keys(info.dependencies);
         if (keys.length > 0) {
             for (const key of keys) {
@@ -74,28 +75,29 @@ function createReadme(info, config) {
             }
         }
         else {
-            format += ' - N/A\r\n';
+            format += ' - N/A\n';
         }
-        format += '\r\n';
+        format += '\n';
     }
-    format += '### Description\r\n';
+    format += '### Description\n';
     if (info.description !== '') {
-        format += `${info.description}\r\n`;
+        format += `${info.description}\n`;
     }
     else {
-        format += 'No description.\r\n';
+        format += 'No description.\n';
     }
     if (config.fullDescription !== '') {
-        format += `\r\n${config.fullDescription}\r\n`;
+        format += `\n${config.fullDescription}\n`;
     }
-    format += '\r\n';
+    format += '\n';
     if (config.closing !== '') {
-        format += `${config.closing}\r\n`;
+        format += `${config.closing}\n`;
     }
     if (config.footer !== '') {
-        format += `\r\n${config.footer}`;
-        format += '\r\n';
+        format += `\n${config.footer}`;
+        format += '\n';
     }
+    format = eol.crlf(format);
     return format;
 }
 function updateContent(github, content, file, message, user, email) {

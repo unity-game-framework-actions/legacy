@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 import {promises as fs} from 'fs'
 import * as yaml from 'js-yaml'
+import * as eol from 'eol'
 
 run()
 
@@ -42,22 +43,22 @@ async function run(): Promise<void> {
 function createReadme(info: any, config: any): string {
   let format = ''
 
-  format += `# ${info.name}\r\n`
-  format += `${info.displayName}\r\n`
-  format += '\r\n'
+  format += `# ${info.name}\n`
+  format += `${info.displayName}\n`
+  format += '\n'
 
-  format += '## Info\r\n'
-  format += ` - **Version**: \`${info.version}\`\r\n`
-  format += ` - **Unity**: \`${info.unity}\`\r\n`
+  format += '## Info\n'
+  format += ` - **Version**: \`${info.version}\`\n`
+  format += ` - **Unity**: \`${info.unity}\`\n`
 
   if (info.api !== '') {
-    format += ` - **API Compatibility Level**: \`${info.api}\`\r\n`
+    format += ` - **API Compatibility Level**: \`${info.api}\`\n`
   }
 
-  format += '\r\n'
+  format += '\n'
 
   if (info.dependencies != null) {
-    format += '### Dependencies'
+    format += '### Dependencies\n'
 
     const keys = Object.keys(info.dependencies)
 
@@ -68,34 +69,36 @@ function createReadme(info: any, config: any): string {
         format += ` - ${key}: \'${value}\'`
       }
     } else {
-      format += ' - N/A\r\n'
+      format += ' - N/A\n'
     }
 
-    format += '\r\n'
+    format += '\n'
   }
 
-  format += '### Description\r\n'
+  format += '### Description\n'
 
   if (info.description !== '') {
-    format += `${info.description}\r\n`
+    format += `${info.description}\n`
   } else {
-    format += 'No description.\r\n'
+    format += 'No description.\n'
   }
 
   if (config.fullDescription !== '') {
-    format += `\r\n${config.fullDescription}\r\n`
+    format += `\n${config.fullDescription}\n`
   }
 
-  format += '\r\n'
+  format += '\n'
 
   if (config.closing !== '') {
-    format += `${config.closing}\r\n`
+    format += `${config.closing}\n`
   }
 
   if (config.footer !== '') {
-    format += `\r\n${config.footer}`
-    format += '\r\n'
+    format += `\n${config.footer}`
+    format += '\n'
   }
+
+  format = eol.crlf(format)
 
   return format
 }

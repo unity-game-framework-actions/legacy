@@ -8,7 +8,7 @@ run()
 async function run(): Promise<void> {
   try {
     const fileInput = core.getInput('file', {required: true})
-    const isPath = core.getInput('isPath', {required: true}) === 'true'
+    const isPath = core.getInput('isPath') === 'true'
     const write = core.getInput('write') === 'true'
     const getInput = core.getInput('get')
     const setInput = core.getInput('set')

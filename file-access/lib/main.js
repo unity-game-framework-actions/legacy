@@ -28,7 +28,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const fileInput = core.getInput('file', { required: true });
-            const isPath = core.getInput('isPath', { required: true }) === 'true';
+            const isPath = core.getInput('isPath') === 'true';
             const write = core.getInput('write') === 'true';
             const getInput = core.getInput('get');
             const setInput = core.getInput('set');

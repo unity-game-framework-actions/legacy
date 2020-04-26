@@ -4153,51 +4153,51 @@ function run() {
     });
 }
 function createReadme(info, config) {
-    let format = '';
-    format += `# ${info.name}\n`;
-    format += `${info.displayName}\n`;
-    format += '\n';
-    format += '## Info\n';
-    format += ` - **Version**: \`${info.version}\`\n`;
-    format += ` - **Unity**: \`${info.unity}\`\n`;
+    let content = '';
+    content += `# ${info.name}\n`;
+    content += `${info.displayName}\n`;
+    content += '\n';
+    content += '## Info\n';
+    content += ` - **Version**: \`${info.version}\`\n`;
+    content += ` - **Unity**: \`${info.unity}\`\n`;
     if (info.api !== '') {
-        format += ` - **API Compatibility Level**: \`${info.api}\`\n`;
+        content += ` - **API Compatibility Level**: \`${info.api}\`\n`;
     }
-    format += '\n';
+    content += '\n';
     if (info.dependencies != null) {
-        format += '### Dependencies\n';
+        content += '### Dependencies\n';
         const keys = Object.keys(info.dependencies);
         if (keys.length > 0) {
             for (const key of keys) {
                 const value = info.dependencies[key];
-                format += ` - \`${key}\`: \`${value}\`\n`;
+                content += ` - \`${key}\`: \`${value}\`\n`;
             }
         }
         else {
-            format += ' - N/A\n';
+            content += ' - N/A\n';
         }
-        format += '\n';
+        content += '\n';
     }
-    format += '### Description\n';
+    content += '### Description\n';
     if (info.description !== '') {
-        format += `${info.description}\n`;
+        content += `${info.description}\n`;
     }
     else {
-        format += 'No description.\n';
+        content += 'No description.\n';
     }
     if (config.fullDescription !== '') {
-        format += `\n${config.fullDescription}\n`;
+        content += `\n${config.fullDescription}\n`;
     }
-    format += '\n';
+    content += '\n';
     if (config.closing !== '') {
-        format += `${config.closing}\n`;
+        content += `${config.closing}\n`;
     }
     if (config.footer !== '') {
-        format += `\n${config.footer}`;
-        format += '\n';
+        content += `\n${config.footer}`;
+        content += '\n';
     }
-    format = eol.crlf(format);
-    return format;
+    content = eol.crlf(content);
+    return content;
 }
 function updateContent(github, content, file, message, user, email) {
     return __awaiter(this, void 0, void 0, function* () {

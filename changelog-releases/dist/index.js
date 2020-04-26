@@ -4119,6 +4119,7 @@ const core = __importStar(__webpack_require__(470));
 const github_1 = __webpack_require__(469);
 const fs_1 = __webpack_require__(747);
 const yaml = __importStar(__webpack_require__(414));
+const eol = __importStar(__webpack_require__(975));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -4152,7 +4153,8 @@ function createChangelogContent(github, config) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
         releases.sort((a, b) => b.published_at.localeCompare(a.published_at));
-        const content = formatReleaseAll(releases, config);
+        let content = formatReleaseAll(releases, config);
+        content = eol.crlf(content);
         return content;
     });
 }
@@ -29565,6 +29567,54 @@ function onceStrict (fn) {
   f.called = false
   return f
 }
+
+
+/***/ }),
+
+/***/ 975:
+/***/ (function(module) {
+
+!function(root, name, make) {
+  if ( true && module.exports) module.exports = make()
+  else root[name] = make()
+}(this, 'eol', function() {
+
+  var api = {}
+  var isWindows = typeof process != 'undefined' && 'win32' === process.platform
+  var linebreak = isWindows ? '\r\n' : '\n'
+  var newline = /\r\n|\r|\n/g
+
+  function before(text) {
+    return linebreak + text
+  }
+
+  function after(text) {
+    return text + linebreak
+  }
+
+  function converts(to) {
+    function convert(text) {
+      return text.replace(newline, to)
+    }
+    convert.toString = function() {
+      return to
+    }
+    return convert 
+  }
+
+  function split(text) {
+    return text.split(newline)
+  }
+
+  api['lf'] = converts('\n')
+  api['cr'] = converts('\r')
+  api['crlf'] = converts('\r\n')
+  api['auto'] = converts(linebreak)
+  api['before'] = before
+  api['after'] = after
+  api['split'] = split
+  return api
+});
 
 
 /***/ }),

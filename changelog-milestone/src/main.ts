@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 import {promises as fs} from 'fs'
 import * as yaml from 'js-yaml'
+import * as eol from 'eol'
 import indentString from 'indent-string'
 
 run()
@@ -69,6 +70,8 @@ async function createChangelogContent(github: GitHub, milestoneNumberOrTitle: st
   } else {
     content += `\r\n${config.releaseNotes.descriptionEmptyRelease}\r\n`
   }
+
+  content = eol.crlf(content)
 
   return content
 }

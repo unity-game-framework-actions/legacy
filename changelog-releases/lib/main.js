@@ -20,6 +20,7 @@ const core = __importStar(require("@actions/core"));
 const github_1 = require("@actions/github");
 const fs_1 = require("fs");
 const yaml = __importStar(require("js-yaml"));
+const eol = __importStar(require("eol"));
 run();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -53,7 +54,8 @@ function createChangelogContent(github, config) {
     return __awaiter(this, void 0, void 0, function* () {
         const releases = yield github.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/releases`);
         releases.sort((a, b) => b.published_at.localeCompare(a.published_at));
-        const content = formatReleaseAll(releases, config);
+        let content = formatReleaseAll(releases, config);
+        content = eol.crlf(content);
         return content;
     });
 }

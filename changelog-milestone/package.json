@@ -26,6 +26,7 @@
     "@actions/core": "^1.2.0",
     "@actions/github": "^2.1.1",
     "@types/js-yaml": "^3.12.3",
+    "eol": "^0.9.1",
     "indent-string": "^4.0.0"
   },
   "devDependencies": {

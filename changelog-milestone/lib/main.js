@@ -23,6 +23,7 @@ const core = __importStar(require("@actions/core"));
 const github_1 = require("@actions/github");
 const fs_1 = require("fs");
 const yaml = __importStar(require("js-yaml"));
+const eol = __importStar(require("eol"));
 const indent_string_1 = __importDefault(require("indent-string"));
 run();
 function run() {
@@ -81,6 +82,7 @@ function createChangelogContent(github, milestoneNumberOrTitle, config) {
         else {
             content += `\r\n${config.releaseNotes.descriptionEmptyRelease}\r\n`;
         }
+        content = eol.crlf(content);
         return content;
     });
 }

@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {context, GitHub} from '@actions/github'
 import {promises as fs} from 'fs'
 import * as yaml from 'js-yaml'
+import * as eol from 'eol'
 
 run()
 
@@ -41,7 +42,9 @@ async function createChangelogContent(github: GitHub, config: any): Promise<stri
 
   releases.sort((a, b) => b.published_at.localeCompare(a.published_at))
 
-  const content = formatReleaseAll(releases, config)
+  let content = formatReleaseAll(releases, config)
+
+  content = eol.crlf(content)
 
   return content
 }

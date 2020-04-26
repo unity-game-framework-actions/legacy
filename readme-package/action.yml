@@ -1,0 +1,25 @@
+name: 'UGF.Readme.Package'
+description: 'No description.'
+inputs:
+  token:
+    default: ${{ github.token }}
+  package:
+    required: true
+  commit:
+    default: true
+  message:
+    default: Update readme
+  user:
+    default: GitHub Action
+  email:
+    default: action@github.com
+  file:
+    default: readme.md
+  config:
+    default: .github/about.yml
+output:
+  content:
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

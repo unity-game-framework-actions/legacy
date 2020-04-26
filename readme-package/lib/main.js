@@ -71,7 +71,7 @@ function createReadme(info, config) {
         if (keys.length > 0) {
             for (const key of keys) {
                 const value = info.dependencies[key];
-                format += ` - ${key}: \'${value}\'`;
+                format += ` - \`${key}\`: \`${value}\`\n`;
             }
         }
         else {

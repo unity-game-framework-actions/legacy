@@ -66,7 +66,7 @@ function createReadme(info: any, config: any): string {
       for (const key of keys) {
         const value = info.dependencies[key]
 
-        format += ` - ${key}: \'${value}\'`
+        format += ` - \`${key}\`: \`${value}\`\n`
       }
     } else {
       format += ' - N/A\n'

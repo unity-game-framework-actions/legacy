@@ -50,11 +50,6 @@ function createReadme(info: any, config: any): string {
   content += '## Info\n'
   content += ` - **Version**: \`${info.version}\`\n`
   content += ` - **Unity**: \`${info.unity}\`\n`
-
-  if (info.api !== '') {
-    content += ` - **API Compatibility Level**: \`${info.api}\`\n`
-  }
-
   content += '\n'
 
   if (info.dependencies != null) {

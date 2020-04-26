@@ -61,9 +61,6 @@ function createReadme(info, config) {
     content += '## Info\n';
     content += ` - **Version**: \`${info.version}\`\n`;
     content += ` - **Unity**: \`${info.unity}\`\n`;
-    if (info.api !== '') {
-        content += ` - **API Compatibility Level**: \`${info.api}\`\n`;
-    }
     content += '\n';
     if (info.dependencies != null) {
         content += '### Dependencies\n';

@@ -70,6 +70,10 @@ function createReadme(info: any, config: any): string {
     content += '\n'
   }
 
+  content += '### Changelog'
+  content += '- [Full changelog](changelog.md)'
+  content += '\n'
+
   content += '### Description\n'
 
   if (info.description !== '') {

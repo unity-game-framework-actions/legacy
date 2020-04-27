@@ -106,7 +106,7 @@ function getMilestone(github, milestoneNumberOrTitle) {
 }
 function formatMilestone(milestone) {
     let format = '';
-    format += ` - [Milestone](${milestone.html_url}?closed=1)\r\n\r\n`;
+    format += `- [Milestone](${milestone.html_url}?closed=1)\r\n\r\n`;
     if (milestone.description !== '') {
         format += `${milestone.description}\r\n\r\n`;
     }
@@ -117,7 +117,7 @@ function formatIssues(groups) {
     for (const group of groups) {
         format += `### ${group.name}\r\n`;
         for (const issue of group.issues) {
-            format += ` - ${formatIssue(issue)}\r\n`;
+            format += `- ${formatIssue(issue)}\r\n`;
         }
         format += '\r\n';
     }

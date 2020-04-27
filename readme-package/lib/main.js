@@ -59,8 +59,8 @@ function createReadme(info, config) {
     content += `${info.displayName}\n`;
     content += '\n';
     content += '## Info\n';
-    content += ` - **Version**: \`${info.version}\`\n`;
-    content += ` - **Unity**: \`${info.unity}\`\n`;
+    content += `- **Version**: \`${info.version}\`\n`;
+    content += `- **Unity**: \`${info.unity}\`\n`;
     content += '\n';
     if (info.dependencies != null) {
         content += '### Dependencies\n';
@@ -68,11 +68,11 @@ function createReadme(info, config) {
         if (keys.length > 0) {
             for (const key of keys) {
                 const value = info.dependencies[key];
-                content += ` - \`${key}\`: \`${value}\`\n`;
+                content += `- \`${key}\`: \`${value}\`\n`;
             }
         }
         else {
-            content += ' - N/A\n';
+            content += '- N/A\n';
         }
         content += '\n';
     }

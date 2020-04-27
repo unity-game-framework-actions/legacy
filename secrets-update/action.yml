@@ -1,6 +1,8 @@
 name: 'UGF.Secrets.Update'
 description: 'No description.'
 inputs:
+  token:
+    default: ${{ github.token }}
   type:
     default: yaml
   repo:

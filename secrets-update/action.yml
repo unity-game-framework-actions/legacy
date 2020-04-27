@@ -1,0 +1,12 @@
+name: 'UGF.Secrets.Update'
+description: 'No description.'
+inputs:
+  type:
+    default: yaml
+  repo:
+    required: true
+  secrets:
+    default: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

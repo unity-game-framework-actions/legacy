@@ -734,7 +734,7 @@ function extractFromInput(input, regex) {
             }
         }
     }
-    core.warning(`No matches found in specified input with regex: '${regex}'.`);
+    core.info(`No matches found in specified input with regex: '${regex}'.`);
     return '';
 }
 

@@ -92,7 +92,7 @@ function getProject(github, name) {
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo
         });
-        for (const project of projects) {
+        for (const project of projects.data) {
             if (project.name === name) {
                 return project;
             }
@@ -105,7 +105,7 @@ function getColumn(github, project, name) {
         const columns = yield github.projects.listColumns({
             project_id: project.id
         });
-        for (const column of columns) {
+        for (const column of columns.data) {
             if (column.name === name) {
                 return column;
             }

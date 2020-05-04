@@ -80,7 +80,7 @@ async function getProject(github: GitHub, name: string): Promise<any> {
     repo: context.repo.repo
   })
 
-  for (const project of projects) {
+  for (const project of projects.data) {
     if (project.name === name) {
       return project
     }
@@ -94,7 +94,7 @@ async function getColumn(github: GitHub, project: any, name: string): Promise<an
     project_id: project.id
   })
 
-  for (const column of columns) {
+  for (const column of columns.data) {
     if (column.name === name) {
       return column
     }

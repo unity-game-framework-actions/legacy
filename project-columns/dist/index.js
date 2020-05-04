@@ -3586,9 +3586,12 @@ function updateColumn(github, project, name, updateName, position) {
         }
     });
 }
-function getProject(gitHub, name) {
+function getProject(github, name) {
     return __awaiter(this, void 0, void 0, function* () {
-        const projects = yield gitHub.paginate(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/projects`);
+        const projects = yield github.projects.listForRepo({
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo
+        });
         for (const project of projects) {
             if (project.name === name) {
                 return project;
@@ -3599,7 +3602,9 @@ function getProject(gitHub, name) {
 }
 function getColumn(github, project, name) {
     return __awaiter(this, void 0, void 0, function* () {
-        const columns = yield github.paginate(`GET /projects/${project.id}/columns`);
+        const columns = yield github.projects.listColumns({
+            project_id: project.id
+        });
         for (const column of columns) {
             if (column.name === name) {
                 return column;

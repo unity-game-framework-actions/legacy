@@ -74,8 +74,11 @@ async function updateColumn(github: GitHub, project: any, name: string, updateNa
   }
 }
 
-async function getProject(gitHub: GitHub, name: string): Promise<any> {
-  const projects = await gitHub.paginate(`GET /repos/${context.repo.owner}/${context.repo.repo}/projects`)
+async function getProject(github: GitHub, name: string): Promise<any> {
+  const projects = await github.projects.listForRepo({
+    owner: context.repo.owner,
+    repo: context.repo.repo
+  })
 
   for (const project of projects) {
     if (project.name === name) {
@@ -87,7 +90,9 @@ async function getProject(gitHub: GitHub, name: string): Promise<any> {
 }
 
 async function getColumn(github: GitHub, project: any, name: string): Promise<any> {
-  const columns = await github.paginate(`GET /projects/${project.id}/columns`)
+  const columns = await github.projects.listColumns({
+    project_id: project.id
+  })
 
   for (const column of columns) {
     if (column.name === name) {

@@ -63,7 +63,7 @@ async function updateColumn(github: GitHub, project: any, name: string, updateNa
   }
 
   if (position !== '') {
-    const pos = await getPosition(github, position)
+    const pos = await getPosition(github, project, position)
     const response = await github.projects.moveColumn({
       column_id: column.id,
       position: pos
@@ -103,7 +103,7 @@ async function getColumn(github: GitHub, project: any, name: string): Promise<an
   throw `Column not found by the specified name: '${name}' (project: '${project.name}').`
 }
 
-async function getPosition(github: GitHub, position: string): Promise<string> {
+async function getPosition(github: GitHub, project: any, position: string): Promise<string> {
   if (position.includes(':')) {
     const split = position.split(':')
 
@@ -113,9 +113,9 @@ async function getPosition(github: GitHub, position: string): Promise<string> {
 
     const pos = split[0]
     const name = split[1]
-    const project = await getProject(github, name)
+    const column = await getColumn(github, project, name)
 
-    return `${pos}:${project.id}`
+    return `${pos}:${column.id}`
   }
 
   return position

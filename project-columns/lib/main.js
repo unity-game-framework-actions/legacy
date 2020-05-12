@@ -76,7 +76,7 @@ function updateColumn(github, project, name, updateName, position) {
             core.info(JSON.stringify(response));
         }
         if (position !== '') {
-            const pos = yield getPosition(github, position);
+            const pos = yield getPosition(github, project, position);
             const response = yield github.projects.moveColumn({
                 column_id: column.id,
                 position: pos
@@ -113,7 +113,7 @@ function getColumn(github, project, name) {
         throw `Column not found by the specified name: '${name}' (project: '${project.name}').`;
     });
 }
-function getPosition(github, position) {
+function getPosition(github, project, position) {
     return __awaiter(this, void 0, void 0, function* () {
         if (position.includes(':')) {
             const split = position.split(':');
@@ -122,8 +122,8 @@ function getPosition(github, position) {
             }
             const pos = split[0];
             const name = split[1];
-            const project = yield getProject(github, name);
-            return `${pos}:${project.id}`;
+            const column = yield getColumn(github, project, name);
+            return `${pos}:${column.id}`;
         }
         return position;
     });

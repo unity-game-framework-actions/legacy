@@ -4193,7 +4193,7 @@ function formatReleaseAll(releases, config) {
     return format;
 }
 function formatRelease(release, config) {
-    const name = release.name !== '' ? release.name : release.tag_name;
+    const name = release.name !== '' && release.name !== release.tag_name ? `${release.tag_name} (${release.name})` : release.tag_name;
     const date = formatDate(release.published_at);
     const body = release.body !== '' ? release.body : config.changelog.descriptionEmptyRelease;
     return `## [${name}](${release.html_url}) - ${date}\r\n${body}\r\n\r\n`;

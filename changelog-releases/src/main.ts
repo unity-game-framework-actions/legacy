@@ -89,7 +89,7 @@ function formatReleaseAll(releases: any[], config: any): string {
 }
 
 function formatRelease(release: any, config: any): string {
-  const name = release.name !== '' ? release.name : release.tag_name
+  const name = release.name !== '' && release.name !== release.tag_name ? `${release.tag_name} (${release.name})` : release.tag_name
   const date = formatDate(release.published_at)
   const body = release.body !== '' ? release.body : config.changelog.descriptionEmptyRelease
 

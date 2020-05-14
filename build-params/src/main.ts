@@ -8,16 +8,18 @@ async function run(): Promise<void> {
   try {
     const configPath = core.getInput('config')
     const paramsInput = core.getInput('params')
+    const paramsType = core.getInput('paramsType')
     const extract = core.getInput('extract') === 'true'
     const extractRegex = core.getInput('extractRegex')
     const type = core.getInput('type')
+    const contentType = core.getInput('contentType')
 
     const configFile = await fs.readFile(configPath)
     const config = parse(configFile.toString(), type)
     const paramsText = extractParamsText(paramsInput, extract, extractRegex)
-    const params = parse(paramsText, type)
+    const params = parse(paramsText, paramsType)
     const merged = Object.assign(config, params)
-    const content = format(merged, type)
+    const content = format(merged, contentType)
 
     core.info('Config')
     core.info(JSON.stringify(config, null, 2))

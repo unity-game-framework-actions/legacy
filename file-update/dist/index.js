@@ -3546,7 +3546,7 @@ function getContent(input, isPath) {
     return __awaiter(this, void 0, void 0, function* () {
         if (isPath) {
             const file = yield fs_1.promises.readFile(input);
-            const content = JSON.parse(file.toString());
+            const content = file.toString();
             return content;
         }
         return input;

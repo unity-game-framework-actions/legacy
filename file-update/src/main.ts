@@ -31,7 +31,7 @@ async function run(): Promise<void> {
 async function getContent(input: string, isPath: boolean): Promise<string> {
   if (isPath) {
     const file = await fs.readFile(input)
-    const content = JSON.parse(file.toString())
+    const content = file.toString()
 
     return content
   }

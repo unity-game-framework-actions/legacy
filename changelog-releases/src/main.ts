@@ -14,6 +14,7 @@ async function run(): Promise<void> {
     const user = core.getInput('user')
     const email = core.getInput('email')
     const file = core.getInput('file')
+    const ref = core.getInput('ref')
     const configPath = core.getInput('config')
 
     const github = new GitHub(token)
@@ -25,7 +26,7 @@ async function run(): Promise<void> {
     core.info(JSON.stringify(config, null, 2))
 
     if (commit) {
-      await updateChangelogContent(github, content, file, message, user, email)
+      await updateChangelogContent(github, content, file, ref, message, user, email)
     }
 
     core.info('Content Output')
@@ -49,8 +50,8 @@ async function createChangelogContent(github: GitHub, config: any): Promise<stri
   return content
 }
 
-async function updateChangelogContent(github: GitHub, content: string, file: string, message: string, user: string, email: string): Promise<void> {
-  const info = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${file}`)
+async function updateChangelogContent(github: GitHub, content: string, file: string, ref: string, message: string, user: string, email: string): Promise<void> {
+  const info = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${file}?ref=${ref}`)
   const base64 = Buffer.from(content).toString('base64')
   const sha = info.data.sha
 

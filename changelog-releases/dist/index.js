@@ -4130,6 +4130,7 @@ function run() {
             const user = core.getInput('user');
             const email = core.getInput('email');
             const file = core.getInput('file');
+            const ref = core.getInput('ref');
             const configPath = core.getInput('config');
             const github = new github_1.GitHub(token);
             const configFile = yield fs_1.promises.readFile(configPath);
@@ -4138,7 +4139,7 @@ function run() {
             core.info('Config');
             core.info(JSON.stringify(config, null, 2));
             if (commit) {
-                yield updateChangelogContent(github, content, file, message, user, email);
+                yield updateChangelogContent(github, content, file, ref, message, user, email);
             }
             core.info('Content Output');
             core.info(content);
@@ -4158,9 +4159,9 @@ function createChangelogContent(github, config) {
         return content;
     });
 }
-function updateChangelogContent(github, content, file, message, user, email) {
+function updateChangelogContent(github, content, file, ref, message, user, email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const info = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}`);
+        const info = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}?ref=${ref}`);
         const base64 = Buffer.from(content).toString('base64');
         const sha = info.data.sha;
         core.info('Content Info');

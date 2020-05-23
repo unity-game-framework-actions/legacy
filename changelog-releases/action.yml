@@ -13,6 +13,8 @@ inputs:
     default: action@github.com
   file:
     default: changelog.md
+  ref:
+    default: master
   config:
     default: .github/changelog.yml
 output:

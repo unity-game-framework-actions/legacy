@@ -9,6 +9,7 @@ async function run(): Promise<void> {
     const token = core.getInput('token')
     const message = core.getInput('message', {required: true})
     const file = core.getInput('file', {required: true})
+    const branch = core.getInput('branch')
     const contentInput = core.getInput('content', {required: true})
     const contentAsPath = core.getInput('contentAsPath') === 'true'
     const user = core.getInput('user')
@@ -17,7 +18,7 @@ async function run(): Promise<void> {
     const github = new GitHub(token)
     const content = await getContent(contentInput, contentAsPath)
 
-    await updateContent(github, content, file, message, user, email)
+    await updateContent(github, content, file, branch, message, user, email)
 
     core.info('Content Output')
     core.info(content)
@@ -39,8 +40,8 @@ async function getContent(input: string, isPath: boolean): Promise<string> {
   return input
 }
 
-async function updateContent(github: GitHub, content: string, file: string, message: string, user: string, email: string): Promise<void> {
-  const info = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${file}`)
+async function updateContent(github: GitHub, content: string, file: string, branch: string, message: string, user: string, email: string): Promise<void> {
+  const info = await github.request(`GET /repos/${context.repo.owner}/${context.repo.repo}/contents/${file}?ref=${branch}`)
   const base64 = Buffer.from(content).toString('base64')
   const sha = info.data.sha
 
@@ -54,6 +55,7 @@ async function updateContent(github: GitHub, content: string, file: string, mess
     message: message,
     content: base64,
     sha: sha,
+    branch: branch,
     committer: {
       name: user,
       email: email

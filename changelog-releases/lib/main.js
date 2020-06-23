@@ -74,6 +74,7 @@ function updateChangelogContent(github, content, file, ref, message, user, email
             message: message,
             content: base64,
             sha: sha,
+            branch: ref,
             committer: {
                 name: user,
                 email: email

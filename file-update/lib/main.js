@@ -26,13 +26,14 @@ function run() {
             const token = core.getInput('token');
             const message = core.getInput('message', { required: true });
             const file = core.getInput('file', { required: true });
+            const branch = core.getInput('branch');
             const contentInput = core.getInput('content', { required: true });
             const contentAsPath = core.getInput('contentAsPath') === 'true';
             const user = core.getInput('user');
             const email = core.getInput('email');
             const github = new github_1.GitHub(token);
             const content = yield getContent(contentInput, contentAsPath);
-            yield updateContent(github, content, file, message, user, email);
+            yield updateContent(github, content, file, branch, message, user, email);
             core.info('Content Output');
             core.info(content);
             core.setOutput('content', content);
@@ -52,9 +53,9 @@ function getContent(input, isPath) {
         return input;
     });
 }
-function updateContent(github, content, file, message, user, email) {
+function updateContent(github, content, file, branch, message, user, email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const info = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}`);
+        const info = yield github.request(`GET /repos/${github_1.context.repo.owner}/${github_1.context.repo.repo}/contents/${file}?ref=${branch}`);
         const base64 = Buffer.from(content).toString('base64');
         const sha = info.data.sha;
         core.info('Content Info');
@@ -66,6 +67,7 @@ function updateContent(github, content, file, message, user, email) {
             message: message,
             content: base64,
             sha: sha,
+            branch: branch,
             committer: {
                 name: user,
                 email: email

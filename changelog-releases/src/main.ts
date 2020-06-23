@@ -65,6 +65,7 @@ async function updateChangelogContent(github: GitHub, content: string, file: str
     message: message,
     content: base64,
     sha: sha,
+    branch: ref,
     committer: {
       name: user,
       email: email

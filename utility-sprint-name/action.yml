@@ -1,0 +1,15 @@
+name: 'UGF.Utility.Sprint.Name'
+description: 'No description.'
+inputs:
+  start:
+    default: ''
+  end:
+    default: ''
+  endType:
+    default: 'length'
+outputs:
+  result:
+    description: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

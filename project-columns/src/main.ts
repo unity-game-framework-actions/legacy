@@ -92,25 +92,24 @@ async function getProjects(github: GitHub, source: string, sourceType: string): 
   switch (sourceType) {
     case 'repo':
       const repo = getOwnerAndRepo(source)
+      const responseRepo = await github.projects.listForRepo({
+        owner: repo.owner,
+        repo: repo.repo
+      })
 
-      return (
-        await github.projects.listForRepo({
-          owner: repo.owner,
-          repo: repo.repo
-        })
-      ).data
+      return responseRepo.data
     case 'user':
-      return (
-        await github.projects.listForUser({
-          username: source
-        })
-      ).data
+      const responseUser = await github.projects.listForUser({
+        username: source
+      })
+
+      return responseUser.data
     case 'org':
-      return (
-        await github.projects.listForOrg({
-          org: source
-        })
-      ).data
+      const responseOrg = await github.projects.listForOrg({
+        org: source
+      })
+
+      return responseOrg.data
     default:
       throw `Invalid source type specified: '${sourceType}'. (Must be 'repo', 'user' or 'org')`
   }

@@ -104,18 +104,21 @@ function getProjects(github, source, sourceType) {
         switch (sourceType) {
             case 'repo':
                 const repo = getOwnerAndRepo(source);
-                return (yield github.projects.listForRepo({
+                const responseRepo = yield github.projects.listForRepo({
                     owner: repo.owner,
                     repo: repo.repo
-                })).data;
+                });
+                return responseRepo.data;
             case 'user':
-                return (yield github.projects.listForUser({
+                const responseUser = yield github.projects.listForUser({
                     username: source
-                })).data;
+                });
+                return responseUser.data;
             case 'org':
-                return (yield github.projects.listForOrg({
+                const responseOrg = yield github.projects.listForOrg({
                     org: source
-                })).data;
+                });
+                return responseOrg.data;
             default:
                 throw `Invalid source type specified: '${sourceType}'. (Must be 'repo', 'user' or 'org')`;
         }

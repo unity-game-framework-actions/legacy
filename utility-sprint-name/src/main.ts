@@ -66,5 +66,5 @@ function formatDate(start: Date, end: Date): string {
 
   result += `- ${endDay} ${endMonth} ${endYear}`
 
-  return ''
+  return result
 }

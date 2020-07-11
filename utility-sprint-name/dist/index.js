@@ -125,7 +125,7 @@ function formatDate(start, end) {
         result += `${startYear} `;
     }
     result += `- ${endDay} ${endMonth} ${endYear}`;
-    return '';
+    return result;
 }
 
 

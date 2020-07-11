@@ -39,7 +39,7 @@ function getName(start, end, endType) {
         case 'length':
             return getNameByLength(start, Number.parseInt(end));
         default:
-            throw `Invalid end type specified: '${endType}'.`;
+            throw `Invalid end type specified: '${endType}'. (Must be 'date' or 'length')`;
     }
 }
 function getNameByDate(start, end) {

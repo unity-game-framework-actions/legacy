@@ -23,22 +23,24 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('token');
+            const source = core.getInput('source', { required: true });
+            const sourceType = core.getInput('sourceType', { required: true });
             const projectName = core.getInput('project', { required: true });
             const columnName = core.getInput('column', { required: true });
             const action = core.getInput('action');
             const name = core.getInput('name');
             const position = core.getInput('position');
             const github = new github_1.GitHub(token);
-            yield doAction(github, projectName, columnName, action, name, position);
+            yield request(github, source, sourceType, projectName, columnName, action, name, position);
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
 }
-function doAction(github, projectName, columnName, action, name, position) {
+function request(github, source, sourceType, projectName, columnName, action, name, position) {
     return __awaiter(this, void 0, void 0, function* () {
-        const project = yield getProject(github, projectName);
+        const project = yield getProject(github, source, sourceType, projectName);
         switch (action) {
             case 'create':
                 yield createColumn(github, project, columnName, position);
@@ -86,18 +88,37 @@ function updateColumn(github, project, name, updateName, position) {
         }
     });
 }
-function getProject(github, name) {
+function getProject(github, source, sourceType, name) {
     return __awaiter(this, void 0, void 0, function* () {
-        const projects = yield github.projects.listForRepo({
-            owner: github_1.context.repo.owner,
-            repo: github_1.context.repo.repo
-        });
-        for (const project of projects.data) {
+        const projects = yield getProjects(github, source, sourceType);
+        for (const project of projects) {
             if (project.name === name) {
                 return project;
             }
         }
         throw `Project not found by the specified name: '${name}'.`;
+    });
+}
+function getProjects(github, source, sourceType) {
+    return __awaiter(this, void 0, void 0, function* () {
+        switch (sourceType) {
+            case 'repo':
+                const repo = getOwnerAndRepo(source);
+                return (yield github.projects.listForRepo({
+                    owner: repo.owner,
+                    repo: repo.repo
+                })).data;
+            case 'user':
+                return (yield github.projects.listForUser({
+                    username: source
+                })).data;
+            case 'org':
+                return (yield github.projects.listForOrg({
+                    org: source
+                })).data;
+            default:
+                throw `Invalid source type specified: '${sourceType}'. (Must be 'repo', 'user' or 'org')`;
+        }
     });
 }
 function getColumn(github, project, name) {
@@ -127,4 +148,14 @@ function getPosition(github, project, position) {
         }
         return position;
     });
+}
+function getOwnerAndRepo(repo) {
+    const split = repo.split('/');
+    if (split.length < 2) {
+        throw `Invalid repository name: '${repo}'.`;
+    }
+    return {
+        owner: split[0],
+        repo: split[1]
+    };
 }

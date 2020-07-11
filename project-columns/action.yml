@@ -3,6 +3,10 @@ description: 'No description.'
 inputs:
   token:
     default: ${{ github.token }}
+  source:
+    default: ${{ github.repository }}
+  sourceType:
+    default: repo
   project:
     required: true
   column:

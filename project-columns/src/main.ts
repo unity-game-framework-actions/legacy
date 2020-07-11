@@ -6,6 +6,8 @@ run()
 async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
+    const source = core.getInput('source', {required: true})
+    const sourceType = core.getInput('sourceType', {required: true})
     const projectName = core.getInput('project', {required: true})
     const columnName = core.getInput('column', {required: true})
     const action = core.getInput('action')
@@ -14,14 +16,14 @@ async function run(): Promise<void> {
 
     const github = new GitHub(token)
 
-    await doAction(github, projectName, columnName, action, name, position)
+    await request(github, source, sourceType, projectName, columnName, action, name, position)
   } catch (error) {
     core.setFailed(error.message)
   }
 }
 
-async function doAction(github: GitHub, projectName: string, columnName: string, action: string, name: string, position: string): Promise<void> {
-  const project = await getProject(github, projectName)
+async function request(github: GitHub, source: string, sourceType: string, projectName: string, columnName: string, action: string, name: string, position: string): Promise<void> {
+  const project = await getProject(github, source, sourceType, projectName)
 
   switch (action) {
     case 'create':
@@ -74,19 +76,44 @@ async function updateColumn(github: GitHub, project: any, name: string, updateNa
   }
 }
 
-async function getProject(github: GitHub, name: string): Promise<any> {
-  const projects = await github.projects.listForRepo({
-    owner: context.repo.owner,
-    repo: context.repo.repo
-  })
+async function getProject(github: GitHub, source: string, sourceType: string, name: string): Promise<any> {
+  const projects = await getProjects(github, source, sourceType)
 
-  for (const project of projects.data) {
+  for (const project of projects) {
     if (project.name === name) {
       return project
     }
   }
 
   throw `Project not found by the specified name: '${name}'.`
+}
+
+async function getProjects(github: GitHub, source: string, sourceType: string): Promise<any[]> {
+  switch (sourceType) {
+    case 'repo':
+      const repo = getOwnerAndRepo(source)
+
+      return (
+        await github.projects.listForRepo({
+          owner: repo.owner,
+          repo: repo.repo
+        })
+      ).data
+    case 'user':
+      return (
+        await github.projects.listForUser({
+          username: source
+        })
+      ).data
+    case 'org':
+      return (
+        await github.projects.listForOrg({
+          org: source
+        })
+      ).data
+    default:
+      throw `Invalid source type specified: '${sourceType}'. (Must be 'repo', 'user' or 'org')`
+  }
 }
 
 async function getColumn(github: GitHub, project: any, name: string): Promise<any> {
@@ -119,4 +146,17 @@ async function getPosition(github: GitHub, project: any, position: string): Prom
   }
 
   return position
+}
+
+function getOwnerAndRepo(repo: string): {owner: string; repo: string} {
+  const split = repo.split('/')
+
+  if (split.length < 2) {
+    throw `Invalid repository name: '${repo}'.`
+  }
+
+  return {
+    owner: split[0],
+    repo: split[1]
+  }
 }

@@ -24,6 +24,8 @@ function run() {
             const start = core.getInput('start');
             const end = core.getInput('end', { required: true });
             const endType = core.getInput('endType', { required: true });
+            const result = getName(start, end, endType);
+            core.setOutput('result', result);
         }
         catch (error) {
             core.setFailed(error.message);

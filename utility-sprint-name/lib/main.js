@@ -34,9 +34,9 @@ function run() {
 }
 function getName(start, end, endType) {
     switch (endType) {
-        case 'Date':
+        case 'date':
             return getNameByDate(start, end);
-        case 'Length':
+        case 'length':
             return getNameByLength(start, Number.parseInt(end));
         default:
             throw `Invalid end type specified: '${endType}'.`;

@@ -18,9 +18,9 @@ async function run(): Promise<void> {
 
 function getName(start: string, end: string, endType: string): string {
   switch (endType) {
-    case 'Date':
+    case 'date':
       return getNameByDate(start, end)
-    case 'Length':
+    case 'length':
       return getNameByLength(start, Number.parseInt(end))
     default:
       throw `Invalid end type specified: '${endType}'.`

@@ -110,7 +110,7 @@ function getNameByLength(start, end) {
     return formatDate(startDate, endDate);
 }
 function formatDate(start, end) {
-    const dayFormat = new Intl.DateTimeFormat('en', { day: '2-digit' });
+    const dayFormat = new Intl.DateTimeFormat('en', { day: 'numeric' });
     const monthFormat = new Intl.DateTimeFormat('en', { month: 'short' });
     const yearFormat = new Intl.DateTimeFormat('en', { year: 'numeric' });
     const startDay = dayFormat.format(start);

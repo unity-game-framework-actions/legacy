@@ -44,7 +44,7 @@ function getNameByLength(start: string, end: number): string {
 }
 
 function formatDate(start: Date, end: Date): string {
-  const dayFormat = new Intl.DateTimeFormat('en', {day: '2-digit'})
+  const dayFormat = new Intl.DateTimeFormat('en', {day: 'numeric'})
   const monthFormat = new Intl.DateTimeFormat('en', {month: 'short'})
   const yearFormat = new Intl.DateTimeFormat('en', {year: 'numeric'})
 
